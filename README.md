@@ -1,36 +1,26 @@
-# 🏓 Ping Pong — Reto de campeones
+# 🕹️ Mini Arcade — Juega y diviértete
 
-Juego de ping-pong arcade para navegador: juega contra la CPU, mueve tu paleta con el dedo o el ratón y llega primero a 7 puntos. Diseño adaptable para móvil, soporte para teclado, PWA instalable y modo offline.
+Colección de 12 juegos gratuitos, adaptados a teléfonos y computadoras. Incluye menú, orientación vertical/horizontal y una guía sencilla antes de cada partida.
 
-## Probar localmente
+## Juegos
 
-Necesitas servir los archivos por HTTP (el service worker no funciona en `file://`). Por ejemplo:
+- Ping-pong contra la CPU
+- Naves de futbolín: equipos espaciales protegen su portería y tratan de marcar
+- Serpiente
+- Rompebloques
+- Esquiva meteoritos
+- Memoria (parejas)
+- Simón dice
+- Reto matemático
+- Secuencia numérica
+- Reflejos
+- Toques rápidos
+- Luces (acertijo)
 
-```bash
-python3 -m http.server 8000
-```
+## Prueba local
 
-Luego abre `http://localhost:8000`.
+Sirve la carpeta por HTTP, por ejemplo `python3 -m http.server 8000`, y abre `http://localhost:8000`.
 
-## Instalar en iPhone
+GitHub Pages se despliega desde la rama `main`, carpeta raíz `/`. La caché offline usa una nueva versión para borrar la anterior al actualizar.
 
-1. Publica el proyecto en un sitio con HTTPS.
-2. Abre el enlace en **Safari**.
-3. Toca **Compartir** → **Añadir a pantalla de inicio** → **Añadir**.
-
-No se requieren permisos especiales. Una vez cargado, el juego también puede funcionar sin conexión.
-
-## Publicación con GitHub Pages
-
-En el repositorio, abre **Settings → Pages**, elige la rama `main` y la carpeta `/ (root)`, y guarda. Cuando termine la publicación, GitHub mostrará el enlace HTTPS del juego. Para instalarlo en iPhone, el repositorio debe ser público o tener Pages habilitado por el plan/configuración de la cuenta. No hace falta conceder permisos al teléfono; la instalación se confirma desde el menú Compartir de Safari.
-
-## Archivos
-
-- `index.html` — estructura y metadatos
-- `styles.css` — interfaz adaptable
-- `game.js` — juego, controles y CPU
-- `manifest.webmanifest` — metadatos PWA
-- `sw.js` — caché para modo offline
-- `icon.svg` — icono del juego
-
-Sin dependencias de ejecución. La tipografía remota es opcional; el juego usa fuentes de sistema si no hay conexión.
+En iPhone, abre el sitio HTTPS en Safari y usa **Compartir → Añadir a pantalla de inicio**. El cambio vertical/horizontal está en la pantalla de cada juego; el bloqueo de orientación física depende del navegador/dispositivo.
