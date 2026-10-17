@@ -15,13 +15,14 @@
   <main class="app">
     <header class="topbar">
       <div class="brand"><span class="brand-icon" aria-hidden="true">🏓</span><div><p class="eyebrow">RETO DE CAMPEONES</p><h1>Ping Pong</h1></div></div>
-      <button id="installButton" class="install-button" hidden>＋ Instalar</button>
+      <div class="header-actions"><button id="shareButton" class="share-button" type="button" aria-label="Compartir juego">↗ <span>Compartir</span></button><button id="installButton" class="install-button" hidden>＋ Instalar</button></div>
     </header>
     <section class="game-card" aria-label="Juego de ping-pong">
       <div class="scoreboard"><div class="player-label"><span class="dot you"></span><span>TÚ</span></div><div class="score"><span id="playerScore">0</span><span class="score-divider">:</span><span id="cpuScore">0</span></div><div class="player-label opponent"><span>CPU</span><span class="dot cpu"></span></div></div>
       <div class="canvas-wrap"><canvas id="game" aria-label="Mesa de ping-pong. Mueve tu paleta con el dedo o las flechas. El primero en llegar a 7 puntos gana." role="img"></canvas><div id="overlay" class="overlay"><div class="overlay-content"><span id="overlayIcon" class="overlay-icon">🏓</span><h2 id="overlayTitle">¿Listo para jugar?</h2><p id="overlayText">Toca la pantalla para mover tu paleta.<br>El primero en llegar a 7 puntos gana.</p><button id="startButton" class="primary-button">Jugar ahora <span>→</span></button></div></div></div>
-      <div class="game-footer"><span><kbd>↑</kbd><kbd>↓</kbd> o arrastra para mover</span><button id="resetButton" class="reset-button" aria-label="Reiniciar juego">↻ <span>Reiniciar</span></button></div>
+      <div class="game-footer"><span>Desliza el dedo, inclina el móvil o usa <kbd>↑</kbd><kbd>↓</kbd></span><button id="resetButton" class="reset-button" aria-label="Reiniciar juego">↻ <span>Reiniciar</span></button></div>
     </section>
+    <section class="how-to-card"><h2>Cómo jugar</h2><ol><li>Toca <strong>Jugar ahora</strong> para empezar.</li><li>Mueve la paleta verde deslizando el dedo sobre la mesa.</li><li>En el móvil, toca <strong>Inclinar móvil</strong> y permite el acceso al movimiento si te lo pide. Inclina suavemente arriba o abajo.</li><li>Devuelve la pelota y gana al llegar primero a <strong>7 puntos</strong>.</li></ol><button id="tiltButton" class="tilt-button" type="button">↕ Inclinar móvil</button><p id="tiltStatus" class="tilt-status" aria-live="polite">El control por inclinación funciona en móviles compatibles.</p></section>
     <section class="install-card"><div class="install-symbol">📲</div><div><h2>Juega donde quieras</h2><p>En iPhone: abre esta página en Safari, toca <strong>Compartir</strong> y luego <strong>Añadir a pantalla de inicio</strong>. No necesitas dar permisos especiales.</p></div></section>
     <footer>Hecho para jugar en el navegador · Gratis y sin anuncios</footer>
   </main>
