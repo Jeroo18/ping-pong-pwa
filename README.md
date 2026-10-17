@@ -1,11 +1,12 @@
 # 🕹️ Mini Arcade — Juega y diviértete
 
-Colección de 12 juegos gratuitos, adaptados a teléfonos y computadoras. Incluye menú, orientación vertical/horizontal y una guía sencilla antes de cada partida.
+Colección de 13 juegos gratuitos, adaptados a teléfonos y computadoras. Incluye menú, orientación vertical/horizontal y una guía sencilla antes de cada partida.
 
 ## Juegos
 
 - Ping-pong contra la CPU
 - Naves de futbolín: equipos espaciales protegen su portería y tratan de marcar
+- Starfighter 3D: vuelo arcade de perspectiva, planetas dibujados, drones, disparos y sectores espaciales
 - Serpiente
 - Rompebloques
 - Esquiva meteoritos
