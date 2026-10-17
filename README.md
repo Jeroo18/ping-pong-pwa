@@ -1,12 +1,12 @@
 # 🕹️ Mini Arcade — Juega y diviértete
 
-Colección de 13 juegos gratuitos, adaptados a teléfonos y computadoras. Incluye menú, orientación vertical/horizontal y una guía sencilla antes de cada partida.
+Colección de 15 juegos gratuitos, adaptados a teléfonos y computadoras. Incluye menú, orientación vertical/horizontal y una guía sencilla antes de cada partida.
 
 ## Juegos
 
 - Ping-pong contra la CPU
 - Naves de futbolín: equipos espaciales protegen su portería y tratan de marcar
-- Starfighter 3D: vuelo arcade de perspectiva, planetas dibujados, drones, disparos y sectores espaciales
+- Starfighter: escena arcade con perspectiva, planetas y drones, todavía simulada en 2D
 - Serpiente
 - Rompebloques
 - Esquiva meteoritos
@@ -17,6 +17,8 @@ Colección de 13 juegos gratuitos, adaptados a teléfonos y computadoras. Incluy
 - Reflejos
 - Toques rápidos
 - Luces (acertijo)
+
+Para el pipeline de modelo 3D real, consulta [`3d-workflow.md`](3d-workflow.md). El modelo GLB real aún debe generarse y suministrarse; no se instaló software ni se consumieron créditos de un generador.
 
 ## Prueba local
 
