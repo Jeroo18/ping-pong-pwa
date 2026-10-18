@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101418">
+<meta name="description" content="Enfoque: temporizador, ruido marrón y mini-pasos para mentes con TDAH. Termina lo que empiezas.">
+<title>Enfoque — Focus timer para TDAH</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<style>
+:root{--bg:#101418;--card:#1a2027;--line:#2a323c;--txt:#e9eef3;--mut:#8b97a5;--acc:#7cf29a;--acc2:#5ec8ff;--warn:#ffb454}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 16px 96px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+header h1{font-size:20px;margin:0}
+.pro{font-size:12px;font-weight:800;background:linear-gradient(90deg,#ffd36e,#ff8ad8);color:#111;border-radius:999px;padding:5px 10px;border:0;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.ring{position:relative;width:240px;height:240px;margin:6px auto 10px}
+.ring svg{transform:rotate(-90deg)}
+.ring .t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .t b{font-size:52px;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.ring .t span{color:var(--mut);font-size:13px}
+.presets,.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+button{font:inherit;font-weight:700;border:1px solid var(--line);background:#222a33;color:var(--txt);border-radius:12px;padding:10px 14px;cursor:pointer}
+button.on{border-color:var(--acc);color:var(--acc)}
+button.main{background:var(--acc);color:#0b1a10;border-color:var(--acc);padding:14px 28px;font-size:17px}
+input[type=text],input[type=number]{width:100%;font:inherit;background:#0f1419;color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:12px}
+input[type=range]{width:100%}
+label{font-size:13px;color:var(--mut);display:block;margin:6px 0}
+ul{list-style:none;margin:8px 0 0;padding:0}
+li{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}
+li:last-child{border:0}
+li.done span{text-decoration:line-through;color:var(--mut)}
+li input{width:22px;height:22px;accent-color:var(--acc)}
+li span{flex:1}
+li .x{border:0;background:none;color:var(--mut);padding:4px 8px}
+.addrow{display:flex;gap:8px;margin-top:8px}
+.addrow input{flex:1}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0c1014ee;border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 8px calc(env(safe-area-inset-bottom) + 8px);backdrop-filter:blur(8px)}
+nav button{flex:1;max-width:170px;background:none;border:0;color:var(--mut);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button i{font-style:normal;font-size:20px}
+nav button.on{color:var(--acc)}
+.tab{display:none}.tab.on{display:block}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stats b{display:block;font-size:26px}
+.stats span{font-size:12px;color:var(--mut)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:10px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;font-size:11px;color:var(--mut)}
+.bars i{display:block;width:100%;background:linear-gradient(var(--acc2),var(--acc));border-radius:6px 6px 2px 2px;min-height:2px}
+.sounds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lock{opacity:.55}
+.modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:16px;z-index:9}
+.modal.show{display:flex}
+.modal .card{max-width:420px;width:100%}
+.price{display:flex;gap:8px;margin:12px 0}
+.price button{flex:1;display:flex;flex-direction:column;gap:2px}
+.price small{font-weight:500;color:var(--mut)}
+.mut{color:var(--mut);font-size:13px}
+h3{margin:0 0 8px;font-size:16px}
+</style>
+</head>
+<body>
+<main>
+  <header><h1>🎯 Enfoque</h1><button class="pro" id="bPro">PRO</button></header>
+
+  <section class="tab on" id="tabFocus">
+    <div class="card">
+      <input type="text" id="task" maxlength="80">
+      <div class="ring">
+        <svg width="240" height="240" viewBox="0 0 240 240"><circle cx="120" cy="120" r="108" fill="none" stroke="#26303a" stroke-width="12"/><circle id="arc" cx="120" cy="120" r="108" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-dasharray="678.6" stroke-dashoffset="0"/><defs><linearGradient id="g"><stop offset="0" stop-color="#5ec8ff"/><stop offset="1" stop-color="#7cf29a"/></linearGradient></defs></svg>
+        <div class="t"><b id="clock">25:00</b><span id="phase"></span></div>
+      </div>
+      <div class="presets" id="presets"></div>
+      <div class="row" style="margin-top:14px"><button class="main" id="bStart"></button><button id="bReset">⟲</button></div>
+    </div>
+    <div class="card">
+      <h3 data-t="stepsTitle"></h3>
+      <p class="mut" data-t="stepsHelp"></p>
+      <ul id="steps"></ul>
+      <div class="addrow"><input type="text" id="stepIn" maxlength="80"><button id="bStep">+</button></div>
+    </div>
+    <div class="card">
+      <h3 data-t="soundTitle"></h3>
+      <div class="sounds" id="sounds"></div>
+      <label data-t="volume"></label><input type="range" id="vol" min="0" max="1" step="0.01" value="0.4">
+    </div>
+  </section>
+
+  <section class="tab" id="tabHabits">
+    <div class="card">
+      <h3 data-t="habitsTitle"></h3>
+      <p class="mut" id="habitsHelp"></p>
+      <ul id="habits"></ul>
+      <div class="addrow"><input type="text" id="habitIn" maxlength="60"><button id="bHabit">+</button></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tabStats">
+    <div class="card stats">
+      <div><b id="sToday">0</b><span data-t="today"></span></div>
+      <div><b id="sStreak">0</b><span data-t="streak"></span></div>
+      <div><b id="sTotal">0</b><span data-t="sessions"></span></div>
+    </div>
+    <div class="card"><h3 data-t="week"></h3><div class="bars" id="bars"></div></div>
+    <div class="card"><h3 data-t="backup"></h3><div class="row"><button id="bExport" data-t="export"></button><button id="bImport" data-t="import"></button></div><input type="file" id="fileIn" accept="application/json" hidden></div>
+  </section>
+</main>
+
+<nav>
+  <button class="on" data-tab="tabFocus"><i>⏱</i><span data-t="navFocus"></span></button>
+  <button data-tab="tabHabits"><i>✅</i><span data-t="navHabits"></span></button>
+  <button data-tab="tabStats"><i>📈</i><span data-t="navStats"></span></button>
+</nav>
+
+<div class="modal" id="mPro"><div class="card">
+  <h3>✨ Enfoque PRO</h3>
+  <ul id="proList"></ul>
+  <div class="price">
+    <button id="bMonthly"><span data-t="monthly"></span><small>US$2.99</small></button>
+    <button id="bYearly" class="on"><span data-t="yearly"></span><small>US$14.99 · -58%</small></button>
+  </div>
+  <div class="row"><button id="bClosePro" data-t="close"></button></div>
+</div></div>
+
+<script src="app.js"></script>
+<script>if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js')</script>
+</body>
+</html>

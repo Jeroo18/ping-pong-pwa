@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#16204a">
+<meta name="description" content="Block Burst: arrastra piezas, completa filas y columnas. Puzzle de bloques infinito.">
+<title>Block Burst — Block Puzzle</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;background:linear-gradient(#16204a,#2b3b8f);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:none}
+canvas{display:block;width:100vw;height:100vh;height:100dvh}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:5}
+.modal.show{display:flex}
+.card{background:#24307a;border-radius:20px;padding:24px;text-align:center;min-width:260px;box-shadow:0 10px 40px #0008}
+.card h2{margin:0 0 8px}
+.card .big{font-size:42px;font-weight:800;margin:6px 0}
+.row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;border:0;border-radius:14px;padding:12px 16px;background:#ffcc33;color:#16204a;box-shadow:0 4px 0 #0004;cursor:pointer}
+button.ghost{background:rgba(255,255,255,.12);color:#fff}
+button small{display:block;font-size:10px;opacity:.75}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="modal" id="mOver"><div class="card">
+  <h2 id="tOver"></h2>
+  <div class="big" id="finalScore">0</div>
+  <div id="bestTxt"></div>
+  <div class="row">
+    <button id="bRevive"></button>
+    <button class="ghost" id="bAgain"></button>
+  </div>
+</div></div>
+<script src="ads.js"></script>
+<script src="game.js"></script>
+<script>if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js')</script>
+</body>
+</html>

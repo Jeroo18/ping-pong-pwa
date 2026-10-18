@@ -1,0 +1,18 @@
+{
+ "name": "Merge Planets — Drop & Merge",
+ "short_name": "Merge Planets",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#0a0a24",
+ "theme_color": "#0a0a24",
+ "icons": [
+  {
+   "src": "icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any maskable"
+  }
+ ]
+}

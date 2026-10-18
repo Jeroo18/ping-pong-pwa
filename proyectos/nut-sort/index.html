@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#1b1440">
+<meta name="description" content="Nut Sort: ordena las tuercas por color. Puzzle relajante con cientos de niveles.">
+<title>Nut Sort — Color Puzzle</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<style>
+:root{--bg1:#1b1440;--bg2:#3a1f6e;--panel:rgba(255,255,255,.08);--txt:#fff;--accent:#ffcc33}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--txt);background:linear-gradient(160deg,var(--bg1),var(--bg2));overflow:hidden}
+body.theme-1{--bg1:#0f3b2e;--bg2:#1f6e4f}
+body.theme-2{--bg1:#3b1f0f;--bg2:#8a4a1a}
+body.theme-3{--bg1:#0b1f3b;--bg2:#1a4f8a}
+#app{display:flex;flex-direction:column;height:100%;padding:env(safe-area-inset-top) 10px env(safe-area-inset-bottom)}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 4px}
+.pill{background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px}
+h1{font-size:18px;margin:0}
+#board{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px 6px;padding:8px}
+.bolt{position:relative;width:62px;display:flex;flex-direction:column-reverse;align-items:center;padding-bottom:10px;cursor:pointer;transition:transform .15s}
+.bolt::before{content:"";position:absolute;bottom:10px;width:10px;top:-6px;border-radius:5px;background:linear-gradient(90deg,#9aa,#eef,#9aa);z-index:0}
+.bolt::after{content:"";position:absolute;bottom:0;width:62px;height:12px;border-radius:6px;background:linear-gradient(#ccd,#778)}
+.bolt.done::before{background:linear-gradient(90deg,#d9a400,#ffe680,#d9a400)}
+.bolt.sel{transform:translateY(-4px)}
+.nut{position:relative;z-index:1;width:56px;height:24px;margin-top:2px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),inset 0 4px 0 rgba(255,255,255,.35);transition:transform .18s}
+.nut.up{transform:translateY(-34px)}
+.slot{height:24px;margin-top:2px;width:56px}
+footer{display:flex;gap:8px;justify-content:center;padding:10px 0 14px}
+button{font:inherit;border:0;border-radius:14px;padding:10px 14px;font-weight:700;color:#1b1440;background:var(--accent);box-shadow:0 4px 0 rgba(0,0,0,.25);cursor:pointer}
+button.ghost{background:var(--panel);color:#fff}
+button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+button small{display:block;font-size:10px;opacity:.75}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
+.modal.show{display:flex}
+.card{background:#2a1d5c;border-radius:20px;padding:22px;min-width:260px;max-width:90vw;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.card h2{margin:0 0 6px}
+.card .row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.themes button{height:60px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <span class="pill" id="lvl">Nivel 1</span>
+    <h1>Nut Sort</h1>
+    <span class="pill" id="coins">🪙 0</span>
+  </header>
+  <div id="board" aria-label="tablero"></div>
+  <footer>
+    <button class="ghost" id="bUndo">↶ <span data-t="undo"></span><small id="undoLeft"></small></button>
+    <button class="ghost" id="bBolt">+🔩<small data-t="ad"></small></button>
+    <button class="ghost" id="bHint">💡<small>50🪙</small></button>
+    <button class="ghost" id="bRestart">⟳</button>
+    <button class="ghost" id="bShop">🎨</button>
+  </footer>
+</div>
+<div class="modal" id="mWin"><div class="card">
+  <h2 data-t="win"></h2>
+  <p id="winTxt"></p>
+  <div class="row">
+    <button id="bDouble">x2 🪙 <small data-t="ad"></small></button>
+    <button class="ghost" id="bNext" data-t="next"></button>
+  </div>
+</div></div>
+<div class="modal" id="mShop"><div class="card">
+  <h2 data-t="shop"></h2>
+  <div class="themes" id="themes"></div>
+  <div class="row"><button class="ghost" id="bCloseShop" data-t="close"></button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+<script src="ads.js"></script>
+<script src="game.js"></script>
+<script>if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js')</script>
+</body>
+</html>
