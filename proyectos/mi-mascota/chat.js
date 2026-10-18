@@ -11,11 +11,26 @@
   const LOCAL = { small: { id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', size: '290 MB' }, big: { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', size: '880 MB' } };
   const PROVIDERS = {
     gemini: { name: 'Google Gemini', base: 'https://generativelanguage.googleapis.com/v1beta/openai', model: 'gemini-2.5-flash', keyUrl: 'https://aistudio.google.com/apikey' },
-    groq: { name: 'Groq', base: 'https://api.groq.com/openai/v1', model: 'llama-3.1-8b-instant', keyUrl: 'https://console.groq.com/keys' },
+    groq: { name: 'Groq', base: 'https://api.groq.com/openai/v1', model: 'openai/gpt-oss-20b', keyUrl: 'https://console.groq.com/keys' },
     openrouter: { name: 'OpenRouter', base: 'https://openrouter.ai/api/v1', model: 'openrouter/free', keyUrl: 'https://openrouter.ai/keys' },
     openai: { name: 'OpenAI', base: 'https://api.openai.com/v1', model: 'gpt-4o-mini', keyUrl: 'https://platform.openai.com/api-keys' },
     custom: { name: C.custom, base: '', model: '', keyUrl: '' }
   };
+  // Modelos preferidos cuando hay que elegir uno solo (los servicios retiran modelos cada pocos meses)
+  const PREFER = {
+    gemini: [/^gemini-[\d.]+-flash$/, /^gemini-[\d.]+-flash-lite$/, /flash/],
+    groq: [/gpt-oss-20b/, /gpt-oss-120b/, /qwen/, /llama/],
+    openrouter: [/^openrouter\/free$/, /:free$/],
+    openai: [/^gpt-6-luna$/, /^gpt-[\d.]+-mini$/, /^gpt-4o-mini$/, /mini/],
+    custom: []
+  };
+  const ver = id => (id.match(/\d+(\.\d+)?/) || ['0'])[0] * 1;
+  function pickModel(prov, ids) {
+    const ok = ids.filter(i => !/preview|exp|thinking|search|audio|vision|instruct-1k/i.test(i) || prov === 'openrouter');
+    for (const re of PREFER[prov] || []) { const m = ok.filter(i => re.test(i)).sort((a, b) => ver(b) - ver(a)); if (m.length) return m[0]; }
+    return ok[0] || ids[0] || '';
+  }
+  const curModel = () => cfg.models[cfg.provider] || PROVIDERS[cfg.provider].model;
   const LANG_NAME = { en: 'English', es: 'Spanish', pt: 'Brazilian Portuguese', fr: 'French', de: 'German', it: 'Italian', ru: 'Russian', tr: 'Turkish', id: 'Indonesian', hi: 'Hindi', ar: 'Arabic', ja: 'Japanese', ko: 'Korean', zh: 'Simplified Chinese' };
 
   const read = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
@@ -94,7 +109,13 @@
     if (!g.f16) id = id.replace('q4f16_1', 'q4f32_1'); // teléfonos sin soporte de 16 bits
     if (engine && engineId === id) return engine;
     const webllm = await import(WEBLLM_URL);
-    engine = await webllm.CreateMLCEngine(id, { initProgressCallback: r => onProgress(Math.round((r.progress || 0) * 100)) });
+    const opts = { initProgressCallback: r => onProgress(Math.round((r.progress || 0) * 100)) };
+    try { engine = await webllm.CreateMLCEngine(id, opts); }
+    catch (e) {
+      // Si una descarga anterior quedó a medias o dañada, se borra el modelo y se descarga otra vez
+      try { await webllm.deleteModelAllInfoInCache(id); } catch (err) {}
+      engine = await webllm.CreateMLCEngine(id, opts);
+    }
     engineId = id;
     return engine;
   }
@@ -106,8 +127,8 @@
 
   // ---------- Conectar mi IA (API compatible con OpenAI) ----------
   function apiBase() { return (cfg.provider === 'custom' ? cfg.base : PROVIDERS[cfg.provider].base).replace(/\/+$/, ''); }
-  function apiHeaders() {
-    const key = cfg.keys[cfg.provider] || '', h = { 'Content-Type': 'application/json' };
+  function apiHeaders(json = true) {
+    const key = cfg.keys[cfg.provider] || '', h = json ? { 'Content-Type': 'application/json' } : {};
     if (key) h.Authorization = 'Bearer ' + key;
     if (cfg.provider === 'openrouter') { h['HTTP-Referer'] = location.origin; h['X-Title'] = M().T.app; }
     return h;
@@ -117,12 +138,23 @@
     try { const j = JSON.parse(t); const e = Array.isArray(j) ? j[0] && j[0].error : j.error; t = (e && (e.message || e)) || t; } catch (err) {}
     return new Error(`${res.status} ${String(t).slice(0, 220)}`);
   }
-  async function* apiStream(messages) {
+  const modelGone = e => /^(400|404|410|422)\b/.test(e.message) && /model|not found|does not exist|decommission|deprecat|no endpoints|unsupported/i.test(e.message);
+  async function* apiStream(messages, onSwitch) {
     if (!apiBase()) throw new Error(C.needKey);
     if (!cfg.keys[cfg.provider] && cfg.provider !== 'custom') throw new Error(C.needKey);
-    const model = cfg.models[cfg.provider] || PROVIDERS[cfg.provider].model;
-    const res = await fetch(apiBase() + '/chat/completions', { method: 'POST', headers: apiHeaders(), body: JSON.stringify({ model, messages, stream: true, temperature: 0.6 }) });
-    if (!res.ok) throw await apiError(res);
+    const post = model => fetch(apiBase() + '/chat/completions', { method: 'POST', headers: apiHeaders(), body: JSON.stringify({ model, messages, stream: true, temperature: 0.6 }) });
+    let res = await post(curModel());
+    if (!res.ok) {
+      const err = await apiError(res);
+      if (!modelGone(err)) throw err;
+      // El modelo ya no existe: busco uno disponible en la cuenta y reintento una vez
+      let ids = []; try { ids = await listModels(); } catch (e) { throw err; }
+      const m = pickModel(cfg.provider, ids);
+      if (!m || m === curModel()) throw err;
+      cfg.models[cfg.provider] = m; saveCfg(); onSwitch && onSwitch(m);
+      res = await post(m);
+      if (!res.ok) throw await apiError(res);
+    }
     if (!(res.headers.get('content-type') || '').includes('event-stream') || !res.body) {
       const j = await res.json(); yield (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ''; return;
     }
@@ -139,12 +171,21 @@
       }
     }
   }
+  const NOT_CHAT = /embed|tts|whisper|image|imagen|audio|moderation|realtime|transcri|dall-e|veo|live|guard|safety|aqa|banana|lyria|computer-use|robotics/i;
   async function listModels() {
-    const res = await fetch(apiBase() + '/models', { headers: apiHeaders() });
+    let res = await fetch(apiBase() + '/models', { headers: apiHeaders(false) });
+    let native = false;
+    if (!res.ok && cfg.provider === 'gemini') {
+      // Respaldo: la lista nativa de Gemini (la compatible con OpenAI no siempre responde)
+      res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': cfg.keys.gemini || '' } });
+      native = true;
+    }
     if (!res.ok) throw await apiError(res);
     const j = await res.json();
-    return (j.data || j.models || []).map(m => String(m.id || m.name || '').replace(/^models\//, ''))
-      .filter(id => id && !/embed|tts|whisper|image|imagen|audio|moderation|realtime|transcri|dall-e|veo|live|guard|safety/i.test(id)).sort();
+    const list = j.data || j.models || [];
+    return list.filter(m => !native || !m.supportedGenerationMethods || m.supportedGenerationMethods.includes('generateContent'))
+      .map(m => String(m.id || m.name || '').replace(/^models\//, ''))
+      .filter(id => id && !NOT_CHAT.test(id)).sort();
   }
 
   // ---------- Interfaz ----------
@@ -229,7 +270,8 @@
     box.appendChild(bubble); box.scrollTop = box.scrollHeight;
     let out = '';
     try {
-      const stream = cfg.mode === 'local' ? localStream(chatMessages(), p => { bubble.textContent = C.loading(p); }) : apiStream(chatMessages());
+      const stream = cfg.mode === 'local' ? localStream(chatMessages(), p => { bubble.textContent = C.loading(p); })
+        : apiStream(chatMessages(), m => { history.push({ role: 'info', content: C.modelSwitched(m) }); saveHist(); });
       for await (const t of stream) { out += t; bubble.innerHTML = fmt(out); box.scrollTop = box.scrollHeight; }
       history.push({ role: 'assistant', content: out.trim() || '…' });
     } catch (e) {
@@ -252,7 +294,8 @@
             <div id="chBaseRow" style="display:${p === 'custom' ? 'block' : 'none'}"><label>${esc(C.baseUrl)}</label><input id="chBase" inputmode="url" placeholder="https://…/v1" value="${esc(cfg.base)}"></div>
             <label>${esc(C.apiKey)}</label><input id="chKey" type="password" autocomplete="off" value="${esc(cfg.keys[p] || '')}">
             <div class="ch-st" id="chKeyLink">${PROVIDERS[p].keyUrl ? `<a href="${PROVIDERS[p].keyUrl}" target="_blank" rel="noopener">🔑 ${esc(C.getKey)} (${esc(PROVIDERS[p].name)})</a>` : ''}</div>
-            <label>${esc(C.model)}</label><input id="chModel" list="chModels" value="${esc(cfg.models[p] || PROVIDERS[p].model)}"><datalist id="chModels"></datalist>
+            <label>${esc(C.model)}</label><select id="chModelSel">${modelOptions([], cfg.models[p] || PROVIDERS[p].model)}</select>
+            <input id="chModel" style="margin-top:6px;display:${cfg.models[p] || PROVIDERS[p].model ? 'none' : 'block'}" placeholder="${esc(C.modelPh)}" autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc(cfg.models[p] || PROVIDERS[p].model)}">
             <div class="row" style="margin-top:10px"><button id="chLoad">${esc(C.loadModels)}</button><button class="main" id="chSave">${esc(m().T.save)}</button></div>
             <div class="ch-st" id="chApiSt"></div>
           </div></div>
@@ -275,13 +318,35 @@
       cfg.provider = k; cfg.keys[k] = $('#chKey').value.trim(); cfg.models[k] = $('#chModel').value.trim();
       if (k === 'custom') cfg.base = $('#chBase').value.trim();
     };
-    $('#chProv').onchange = e => { const k = e.target.value; cfg.provider = k; saveCfg(); showSettings(); root.querySelector('[data-m=api]').classList.add('on'); root.querySelectorAll('[data-m]').forEach(x => x.classList.toggle('on', x.dataset.m === 'api')); };
-    $('#chLoad').onclick = async () => {
-      readForm(); const st = $('#chApiSt'); st.innerHTML = '<span class="ch-dots"></span>';
-      try { const ids = await listModels(); $('#chModels').innerHTML = ids.map(i => `<option value="${esc(i)}">`).join(''); st.textContent = `${ids.length} ✓ — ${ids.slice(0, 6).join(', ')}${ids.length > 6 ? '…' : ''}`; }
-      catch (e) { st.textContent = C.error(e.message); }
+    $('#chProv').onchange = e => { cfg.provider = e.target.value; saveCfg(); showSettings(); root.querySelectorAll('[data-m]').forEach(x => x.classList.toggle('on', x.dataset.m === 'api')); };
+    $('#chModelSel').onchange = e => {
+      const other = e.target.value === '__other';
+      $('#chModel').style.display = other ? 'block' : 'none';
+      if (other) { $('#chModel').value = ''; $('#chModel').focus(); } else $('#chModel').value = e.target.value;
     };
-    $('#chSave').onclick = () => { readForm(); cfg.mode = 'api'; saveCfg(); $('#chApiSt').textContent = C.saved; };
+    // Trae los modelos de la cuenta; si el elegido no está, elige uno disponible
+    const refresh = async (quiet) => {
+      readForm(); const st = $('#chApiSt');
+      if (!apiBase() || (!cfg.keys[cfg.provider] && cfg.provider !== 'custom')) { if (!quiet) st.textContent = C.needKey; return false; }
+      st.innerHTML = '<span class="ch-dots"></span>';
+      try {
+        const ids = await listModels();
+        let cur = $('#chModel').value.trim();
+        if (ids.length && !ids.includes(cur)) cur = pickModel(cfg.provider, ids);
+        $('#chModelSel').innerHTML = modelOptions(ids, cur);
+        $('#chModel').value = cur; $('#chModel').style.display = cur ? 'none' : 'block';
+        cfg.models[cfg.provider] = cur; saveCfg();
+        st.textContent = C.testOk(cur, ids.length);
+        return true;
+      } catch (e) { st.textContent = C.error(e.message); return false; }
+    };
+    $('#chLoad').onclick = () => refresh(false);
+    $('#chSave').onclick = async () => { readForm(); cfg.mode = 'api'; saveCfg(); $('#chMode') && ($('#chMode').textContent = modeLabel()); await refresh(false); };
+    if (cfg.keys[p] || (p === 'custom' && cfg.base)) refresh(true);
+  }
+  function modelOptions(ids, cur) {
+    const all = [...new Set([cur, ...ids].filter(Boolean))];
+    return all.map(i => `<option value="${esc(i)}" ${i === cur ? 'selected' : ''}>${esc(i)}</option>`).join('') + `<option value="__other">${esc(C.otherModel)}</option>`;
   }
   const m = () => M();
 

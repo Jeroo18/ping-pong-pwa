@@ -14,7 +14,8 @@ window.CHAT_STRINGS = {
     noGpu: 'This phone or browser can’t run AI locally (it needs WebGPU). Try “Connect my AI”.',
     apiInfo: 'Use an AI account you already have. Your key is saved only on this phone.',
     provider: 'Service', apiKey: 'API key', model: 'Model', baseUrl: 'Server address', loadModels: 'Load models', getKey: 'Get a free key', custom: 'Other (OpenAI-compatible)',
-    needKey: 'Enter your API key in ⚙️ first.', error: e => `Couldn’t get an answer: ${e}`, saved: 'Saved ✓'
+    needKey: 'Enter your API key in ⚙️ first.', error: e => `Couldn’t get an answer: ${e}`, saved: 'Saved ✓',
+    modelSwitched: m => `That model is no longer available. I switched to ${m}.`, testOk: (m, n) => `Connected ✓ · ${n} models · using ${m}`, otherModel: 'Other…', modelPh: 'model name'
   },
   es: {
     chat: 'Asistente', chatPh: 'Pregunta sobre tu mascota…', send: 'Enviar', newChat: 'Nuevo chat', settings: 'Ajustes de IA', back: 'Volver',
@@ -30,7 +31,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Este teléfono o navegador no puede usar IA local (necesita WebGPU). Prueba «Conectar mi IA».',
     apiInfo: 'Usa una cuenta de IA que ya tengas. Tu clave se guarda solo en este teléfono.',
     provider: 'Servicio', apiKey: 'Clave de API', model: 'Modelo', baseUrl: 'Dirección del servidor', loadModels: 'Cargar modelos', getKey: 'Conseguir clave gratis', custom: 'Otro (compatible con OpenAI)',
-    needKey: 'Primero escribe tu clave de API en ⚙️.', error: e => `No pude obtener respuesta: ${e}`, saved: 'Guardado ✓'
+    needKey: 'Primero escribe tu clave de API en ⚙️.', error: e => `No pude obtener respuesta: ${e}`, saved: 'Guardado ✓',
+    modelSwitched: m => `Ese modelo ya no está disponible. Cambié a ${m}.`, testOk: (m, n) => `Conectado ✓ · ${n} modelos · usando ${m}`, otherModel: 'Otro…', modelPh: 'nombre del modelo'
   },
   pt: {
     chat: 'Assistente', chatPh: 'Pergunte sobre seu pet…', send: 'Enviar', newChat: 'Nova conversa', settings: 'Ajustes de IA', back: 'Voltar',
@@ -46,7 +48,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Este celular ou navegador não consegue rodar IA local (precisa de WebGPU). Tente “Conectar minha IA”.',
     apiInfo: 'Use uma conta de IA que você já tem. Sua chave fica salva só neste celular.',
     provider: 'Serviço', apiKey: 'Chave de API', model: 'Modelo', baseUrl: 'Endereço do servidor', loadModels: 'Carregar modelos', getKey: 'Obter chave grátis', custom: 'Outro (compatível com OpenAI)',
-    needKey: 'Primeiro digite sua chave de API em ⚙️.', error: e => `Não consegui responder: ${e}`, saved: 'Salvo ✓'
+    needKey: 'Primeiro digite sua chave de API em ⚙️.', error: e => `Não consegui responder: ${e}`, saved: 'Salvo ✓',
+    modelSwitched: m => `Esse modelo não está mais disponível. Mudei para ${m}.`, testOk: (m, n) => `Conectado ✓ · ${n} modelos · usando ${m}`, otherModel: 'Outro…', modelPh: 'nome do modelo'
   },
   fr: {
     chat: 'Assistant', chatPh: 'Pose une question sur ton animal…', send: 'Envoyer', newChat: 'Nouvelle discussion', settings: 'Réglages IA', back: 'Retour',
@@ -62,7 +65,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Ce téléphone ou ce navigateur ne peut pas faire tourner l’IA en local (WebGPU requis). Essaie « Connecter mon IA ».',
     apiInfo: 'Utilise un compte d’IA que tu as déjà. Ta clé reste uniquement sur ce téléphone.',
     provider: 'Service', apiKey: 'Clé API', model: 'Modèle', baseUrl: 'Adresse du serveur', loadModels: 'Charger les modèles', getKey: 'Obtenir une clé gratuite', custom: 'Autre (compatible OpenAI)',
-    needKey: 'Saisis d’abord ta clé API dans ⚙️.', error: e => `Impossible d’obtenir une réponse : ${e}`, saved: 'Enregistré ✓'
+    needKey: 'Saisis d’abord ta clé API dans ⚙️.', error: e => `Impossible d’obtenir une réponse : ${e}`, saved: 'Enregistré ✓',
+    modelSwitched: m => `Ce modèle n’est plus disponible. Je suis passé à ${m}.`, testOk: (m, n) => `Connecté ✓ · ${n} modèles · ${m} utilisé`, otherModel: 'Autre…', modelPh: 'nom du modèle'
   },
   de: {
     chat: 'Assistent', chatPh: 'Frag etwas über dein Tier…', send: 'Senden', newChat: 'Neuer Chat', settings: 'KI-Einstellungen', back: 'Zurück',
@@ -78,7 +82,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Dieses Handy oder dieser Browser kann keine lokale KI ausführen (WebGPU nötig). Versuch „Meine KI verbinden“.',
     apiInfo: 'Nutze ein KI-Konto, das du schon hast. Dein Schlüssel bleibt nur auf diesem Handy.',
     provider: 'Dienst', apiKey: 'API-Schlüssel', model: 'Modell', baseUrl: 'Serveradresse', loadModels: 'Modelle laden', getKey: 'Kostenlosen Schlüssel holen', custom: 'Andere (OpenAI-kompatibel)',
-    needKey: 'Gib zuerst deinen API-Schlüssel unter ⚙️ ein.', error: e => `Keine Antwort erhalten: ${e}`, saved: 'Gespeichert ✓'
+    needKey: 'Gib zuerst deinen API-Schlüssel unter ⚙️ ein.', error: e => `Keine Antwort erhalten: ${e}`, saved: 'Gespeichert ✓',
+    modelSwitched: m => `Dieses Modell ist nicht mehr verfügbar. Ich nutze jetzt ${m}.`, testOk: (m, n) => `Verbunden ✓ · ${n} Modelle · nutze ${m}`, otherModel: 'Andere…', modelPh: 'Modellname'
   },
   it: {
     chat: 'Assistente', chatPh: 'Chiedi qualcosa sul tuo animale…', send: 'Invia', newChat: 'Nuova chat', settings: 'Impostazioni IA', back: 'Indietro',
@@ -94,7 +99,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Questo telefono o browser non può usare l’IA in locale (serve WebGPU). Prova «Collega la mia IA».',
     apiInfo: 'Usa un account IA che hai già. La tua chiave resta solo su questo telefono.',
     provider: 'Servizio', apiKey: 'Chiave API', model: 'Modello', baseUrl: 'Indirizzo del server', loadModels: 'Carica modelli', getKey: 'Ottieni una chiave gratis', custom: 'Altro (compatibile OpenAI)',
-    needKey: 'Prima inserisci la tua chiave API in ⚙️.', error: e => `Non ho ottenuto risposta: ${e}`, saved: 'Salvato ✓'
+    needKey: 'Prima inserisci la tua chiave API in ⚙️.', error: e => `Non ho ottenuto risposta: ${e}`, saved: 'Salvato ✓',
+    modelSwitched: m => `Quel modello non è più disponibile. Sono passato a ${m}.`, testOk: (m, n) => `Connesso ✓ · ${n} modelli · uso ${m}`, otherModel: 'Altro…', modelPh: 'nome del modello'
   },
   ru: {
     chat: 'Помощник', chatPh: 'Спросите о питомце…', send: 'Отправить', newChat: 'Новый чат', settings: 'Настройки ИИ', back: 'Назад',
@@ -110,7 +116,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Этот телефон или браузер не может запускать ИИ локально (нужен WebGPU). Попробуйте «Подключить свой ИИ».',
     apiInfo: 'Используйте свой аккаунт ИИ. Ключ хранится только на этом телефоне.',
     provider: 'Сервис', apiKey: 'API-ключ', model: 'Модель', baseUrl: 'Адрес сервера', loadModels: 'Загрузить модели', getKey: 'Получить бесплатный ключ', custom: 'Другой (совместимый с OpenAI)',
-    needKey: 'Сначала введите API-ключ в ⚙️.', error: e => `Не удалось получить ответ: ${e}`, saved: 'Сохранено ✓'
+    needKey: 'Сначала введите API-ключ в ⚙️.', error: e => `Не удалось получить ответ: ${e}`, saved: 'Сохранено ✓',
+    modelSwitched: m => `Эта модель больше недоступна. Я переключился на ${m}.`, testOk: (m, n) => `Подключено ✓ · моделей: ${n} · используется ${m}`, otherModel: 'Другая…', modelPh: 'название модели'
   },
   tr: {
     chat: 'Asistan', chatPh: 'Hayvanın hakkında sor…', send: 'Gönder', newChat: 'Yeni sohbet', settings: 'Yapay zekâ ayarları', back: 'Geri',
@@ -126,7 +133,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Bu telefon ya da tarayıcı yerel yapay zekâ çalıştıramıyor (WebGPU gerekir). “Kendi yapay zekâmı bağla”yı dene.',
     apiInfo: 'Zaten sahip olduğun bir yapay zekâ hesabını kullan. Anahtarın yalnızca bu telefonda saklanır.',
     provider: 'Servis', apiKey: 'API anahtarı', model: 'Model', baseUrl: 'Sunucu adresi', loadModels: 'Modelleri yükle', getKey: 'Ücretsiz anahtar al', custom: 'Diğer (OpenAI uyumlu)',
-    needKey: 'Önce ⚙️ içinde API anahtarını gir.', error: e => `Cevap alınamadı: ${e}`, saved: 'Kaydedildi ✓'
+    needKey: 'Önce ⚙️ içinde API anahtarını gir.', error: e => `Cevap alınamadı: ${e}`, saved: 'Kaydedildi ✓',
+    modelSwitched: m => `Bu model artık kullanılamıyor. ${m} modeline geçtim.`, testOk: (m, n) => `Bağlandı ✓ · ${n} model · ${m} kullanılıyor`, otherModel: 'Diğer…', modelPh: 'model adı'
   },
   id: {
     chat: 'Asisten', chatPh: 'Tanya soal hewanmu…', send: 'Kirim', newChat: 'Obrolan baru', settings: 'Pengaturan AI', back: 'Kembali',
@@ -142,7 +150,8 @@ window.CHAT_STRINGS = {
     noGpu: 'Ponsel atau browser ini tidak bisa menjalankan AI lokal (butuh WebGPU). Coba “Hubungkan AI-ku”.',
     apiInfo: 'Pakai akun AI yang sudah kamu punya. Kuncimu hanya disimpan di ponsel ini.',
     provider: 'Layanan', apiKey: 'Kunci API', model: 'Model', baseUrl: 'Alamat server', loadModels: 'Muat model', getKey: 'Dapatkan kunci gratis', custom: 'Lainnya (kompatibel OpenAI)',
-    needKey: 'Masukkan kunci API di ⚙️ dulu.', error: e => `Tidak bisa mendapat jawaban: ${e}`, saved: 'Tersimpan ✓'
+    needKey: 'Masukkan kunci API di ⚙️ dulu.', error: e => `Tidak bisa mendapat jawaban: ${e}`, saved: 'Tersimpan ✓',
+    modelSwitched: m => `Model itu sudah tidak tersedia. Aku beralih ke ${m}.`, testOk: (m, n) => `Terhubung ✓ · ${n} model · memakai ${m}`, otherModel: 'Lainnya…', modelPh: 'nama model'
   },
   hi: {
     chat: 'सहायक', chatPh: 'अपने पालतू के बारे में पूछें…', send: 'भेजें', newChat: 'नई चैट', settings: 'AI सेटिंग्स', back: 'वापस',
@@ -158,7 +167,8 @@ window.CHAT_STRINGS = {
     noGpu: 'यह फ़ोन या ब्राउज़र लोकल AI नहीं चला सकता (WebGPU चाहिए)। “मेरा AI जोड़ें” आज़माएँ।',
     apiInfo: 'अपना मौजूदा AI अकाउंट इस्तेमाल करें। आपकी कुंजी सिर्फ़ इसी फ़ोन में सेव रहती है।',
     provider: 'सेवा', apiKey: 'API कुंजी', model: 'मॉडल', baseUrl: 'सर्वर पता', loadModels: 'मॉडल लोड करें', getKey: 'मुफ़्त कुंजी पाएँ', custom: 'अन्य (OpenAI-संगत)',
-    needKey: 'पहले ⚙️ में अपनी API कुंजी डालें।', error: e => `जवाब नहीं मिल सका: ${e}`, saved: 'सेव हो गया ✓'
+    needKey: 'पहले ⚙️ में अपनी API कुंजी डालें।', error: e => `जवाब नहीं मिल सका: ${e}`, saved: 'सेव हो गया ✓',
+    modelSwitched: m => `वह मॉडल अब उपलब्ध नहीं है। मैंने ${m} चुन लिया।`, testOk: (m, n) => `जुड़ गया ✓ · ${n} मॉडल · ${m} इस्तेमाल हो रहा है`, otherModel: 'अन्य…', modelPh: 'मॉडल का नाम'
   },
   ar: {
     chat: 'المساعد', chatPh: 'اسأل عن حيوانك الأليف…', send: 'إرسال', newChat: 'محادثة جديدة', settings: 'إعدادات الذكاء الاصطناعي', back: 'رجوع',
@@ -174,7 +184,8 @@ window.CHAT_STRINGS = {
     noGpu: 'لا يستطيع هذا الهاتف أو المتصفح تشغيل الذكاء الاصطناعي محليًا (يتطلب WebGPU). جرّب «ربط ذكائي الاصطناعي».',
     apiInfo: 'استخدم حساب ذكاء اصطناعي لديك. يُحفظ مفتاحك على هذا الهاتف فقط.',
     provider: 'الخدمة', apiKey: 'مفتاح API', model: 'النموذج', baseUrl: 'عنوان الخادم', loadModels: 'تحميل النماذج', getKey: 'احصل على مفتاح مجاني', custom: 'أخرى (متوافقة مع OpenAI)',
-    needKey: 'أدخل مفتاح API أولًا في ⚙️.', error: e => `تعذّر الحصول على إجابة: ${e}`, saved: 'تم الحفظ ✓'
+    needKey: 'أدخل مفتاح API أولًا في ⚙️.', error: e => `تعذّر الحصول على إجابة: ${e}`, saved: 'تم الحفظ ✓',
+    modelSwitched: m => `هذا النموذج لم يعد متاحًا. انتقلت إلى ${m}.`, testOk: (m, n) => `تم الاتصال ✓ · ${n} نموذج · يُستخدم ${m}`, otherModel: 'أخرى…', modelPh: 'اسم النموذج'
   },
   ja: {
     chat: 'アシスタント', chatPh: 'ペットについて質問…', send: '送信', newChat: '新しいチャット', settings: 'AI設定', back: '戻る',
@@ -190,7 +201,8 @@ window.CHAT_STRINGS = {
     noGpu: 'この端末・ブラウザではローカルAIを使えません（WebGPUが必要）。「自分のAIを接続」をお試しください。',
     apiInfo: 'お持ちのAIアカウントを使います。キーはこの端末にだけ保存されます。',
     provider: 'サービス', apiKey: 'APIキー', model: 'モデル', baseUrl: 'サーバーアドレス', loadModels: 'モデルを読み込む', getKey: '無料キーを取得', custom: 'その他（OpenAI互換）',
-    needKey: 'まず ⚙️ でAPIキーを入力してください。', error: e => `回答を取得できませんでした：${e}`, saved: '保存しました ✓'
+    needKey: 'まず ⚙️ でAPIキーを入力してください。', error: e => `回答を取得できませんでした：${e}`, saved: '保存しました ✓',
+    modelSwitched: m => `そのモデルは使えなくなりました。${m} に切り替えました。`, testOk: (m, n) => `接続OK ✓ · ${n}個のモデル · ${m} を使用`, otherModel: 'その他…', modelPh: 'モデル名'
   },
   ko: {
     chat: '도우미', chatPh: '반려동물에 대해 물어보세요…', send: '보내기', newChat: '새 채팅', settings: 'AI 설정', back: '뒤로',
@@ -206,7 +218,8 @@ window.CHAT_STRINGS = {
     noGpu: '이 폰이나 브라우저는 로컬 AI를 실행할 수 없어요(WebGPU 필요). “내 AI 연결”을 사용해 보세요.',
     apiInfo: '이미 가진 AI 계정을 사용해요. 키는 이 폰에만 저장돼요.',
     provider: '서비스', apiKey: 'API 키', model: '모델', baseUrl: '서버 주소', loadModels: '모델 불러오기', getKey: '무료 키 받기', custom: '기타 (OpenAI 호환)',
-    needKey: '먼저 ⚙️에서 API 키를 입력하세요.', error: e => `답변을 받지 못했어요: ${e}`, saved: '저장됨 ✓'
+    needKey: '먼저 ⚙️에서 API 키를 입력하세요.', error: e => `답변을 받지 못했어요: ${e}`, saved: '저장됨 ✓',
+    modelSwitched: m => `그 모델은 더 이상 사용할 수 없어요. ${m}(으)로 바꿨어요.`, testOk: (m, n) => `연결됨 ✓ · 모델 ${n}개 · ${m} 사용 중`, otherModel: '기타…', modelPh: '모델 이름'
   },
   zh: {
     chat: '助手', chatPh: '问问关于你的宠物…', send: '发送', newChat: '新对话', settings: 'AI 设置', back: '返回',
@@ -222,6 +235,7 @@ window.CHAT_STRINGS = {
     noGpu: '此手机或浏览器无法在本机运行 AI（需要 WebGPU）。试试“连接我的 AI”。',
     apiInfo: '使用你已有的 AI 账号。密钥只保存在这部手机上。',
     provider: '服务', apiKey: 'API 密钥', model: '模型', baseUrl: '服务器地址', loadModels: '加载模型', getKey: '获取免费密钥', custom: '其他（兼容 OpenAI）',
-    needKey: '请先在 ⚙️ 中输入 API 密钥。', error: e => `无法获取回答：${e}`, saved: '已保存 ✓'
+    needKey: '请先在 ⚙️ 中输入 API 密钥。', error: e => `无法获取回答：${e}`, saved: '已保存 ✓',
+    modelSwitched: m => `该模型已不可用，已切换到 ${m}。`, testOk: (m, n) => `已连接 ✓ · ${n} 个模型 · 正在使用 ${m}`, otherModel: '其他…', modelPh: '模型名称'
   }
 };
