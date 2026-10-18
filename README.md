@@ -4,9 +4,18 @@ Colección de 15 juegos gratuitos, adaptados a teléfonos y computadoras. Incluy
 
 ## Juegos
 
-- Ping-pong contra la CPU
-- Naves de futbolín: equipos espaciales protegen su portería y tratan de marcar
-- Starfighter: escena arcade con perspectiva, planetas y drones, todavía simulada en 2D
+**En 3D real (Three.js, incluido localmente para jugar sin conexión):**
+
+- Ping-pong 3D contra la CPU
+- Futbolín 3D: mesa con barras y muñecos que patean
+- Naves de futbolín 3D: equipos espaciales protegen su portería y tratan de marcar
+- Starfighter 3D: pilota, dispara y esquiva asteroides
+- Air Hockey 3D
+
+Si el dispositivo no tiene WebGL, estos juegos se dibujan en 2D automáticamente.
+
+**En 2D:**
+
 - Serpiente
 - Rompebloques
 - Esquiva meteoritos
@@ -18,7 +27,9 @@ Colección de 15 juegos gratuitos, adaptados a teléfonos y computadoras. Incluy
 - Toques rápidos
 - Luces (acertijo)
 
-Para el pipeline de modelo 3D real, consulta [`3d-workflow.md`](3d-workflow.md). Prompt de generación en español: [`3d-prompt-es.txt`](3d-prompt-es.txt). El modelo GLB real aún debe generarse y suministrarse; no se instalaron Blender ni Meshy ni se consumieron créditos de un generador.
+Para el pipeline de modelo 3D real, consulta [`3d-workflow.md`](3d-workflow.md). Prompt de generación en español: [`3d-prompt-es.txt`](3d-prompt-es.txt). Las naves y mesas actuales están construidas con geometría de Three.js; un modelo GLB generado por IA puede sustituirlas más adelante.
+
+Prueba automática de los 15 juegos: `node test-3d.js` (y `NO3D=1 node test-3d.js` para el modo 2D de respaldo).
 
 ## Prueba local
 
