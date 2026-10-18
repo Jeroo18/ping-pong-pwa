@@ -12,6 +12,9 @@
   const MIN_GAP_MS = 90000; // no más de un intersticial cada 90 s
   let lastInterstitial = Date.now();
   let provider = 'demo';
+  // En los ZIP para portales (index.html pone ADS_NO_DEMO) no se muestra el anuncio de prueba:
+  // CrazyGames no permite anuncios propios mientras el juego está en Basic Launch.
+  const NO_DEMO = window.ADS_NO_DEMO === true;
 
   const cg = () => window.CrazyGames && window.CrazyGames.SDK;
   const admob = () => window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob;
@@ -58,7 +61,7 @@
         return !!r;
       }
     } catch (e) { return false; }
-    return demoAd('Anuncio con recompensa · Rewarded ad');
+    return NO_DEMO ? true : demoAd('Anuncio con recompensa · Rewarded ad');
   }
 
   async function interstitial(force) {
@@ -72,7 +75,7 @@
         return true;
       }
     } catch (e) { return false; }
-    return demoAd('Anuncio · Ad');
+    return NO_DEMO ? false : demoAd('Anuncio · Ad');
   }
 
   // Avisos de juego que CrazyGames usa para pausar/medir (no hacen nada fuera de ahí)
