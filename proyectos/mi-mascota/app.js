@@ -46,7 +46,7 @@
     $('fab').hidden = true;
     const up = upcomingFor(D.pets).filter(x => daysUntil(x.next) <= 30);
     $('view').innerHTML = `
-      <header><h1>🐾 ${T.app}</h1><button class="lang" id="bLang"></button><button class="pro" id="bPro">${D.pro ? 'PRO ✓' : 'PRO'}</button></header>
+      <header><h1>🐾 ${T.app}</h1><button class="lang" id="bChat" aria-label="${T.app}">💬</button><button class="lang" id="bLang"></button><button class="pro" id="bPro">${D.pro ? 'PRO ✓' : 'PRO'}</button></header>
       <div class="pets">
         ${D.pets.map(p => `<div class="card pet" data-pet="${p.id}">${avatar(p)}<b>${esc(p.name)}</b><small>${esc(p.breed || T[p.species] || '')}${p.birth ? ' · ' + age(p.birth) : ''}</small></div>`).join('')}
         <button class="card pet add" id="bAddPet"><div class="avatar">+</div>${T.addPet}</button>
@@ -59,6 +59,7 @@
     $('bAddPet').onclick = () => (!D.pro && D.pets.length >= FREE_PETS) ? openPro() : petForm();
     $('bPro').onclick = openPro;
     I18N.button($('bLang'));
+    $('bChat').onclick = () => window.Chat && Chat.open();
     $('bExport').onclick = exportJson; $('bImport').onclick = () => $('fileIn').click();
     bindRows();
   }
@@ -95,7 +96,7 @@
     const list = route.tab === 'up' ? upcomingFor([p]).map(x => x.r) : p.records.filter(r => r.type === route.tab).sort((a, b) => b.date.localeCompare(a.date));
     const lastW = p.records.filter(r => r.type === 'weight').sort((a, b) => b.date.localeCompare(a.date))[0];
     $('view').innerHTML = `
-      <header><button class="back" id="bBack">‹</button><h1></h1><button class="sm" id="bEditPet">✎</button></header>
+      <header><button class="back" id="bBack">‹</button><h1></h1><button class="sm" id="bChatPet">💬</button><button class="sm" id="bEditPet">✎</button></header>
       <div class="card hero">${avatar(p)}<div><h2>${esc(p.name)}</h2><small>${esc(p.breed || T[p.species])}${p.birth ? ' · ' + age(p.birth) : ''}${lastW ? ` · ${lastW.kg} kg` : ''}</small></div></div>
       <div class="tabs">${tabs.map(t => `<button data-tab="${t}" class="${route.tab === t ? 'on' : ''}">${T.tabs[t]}</button>`).join('')}</div>
       ${route.tab === 'weight' ? weightChart(p) : ''}
@@ -103,6 +104,7 @@
       <div class="row"><button id="bPassport">${D.pro ? '' : '🔒 '}${T.passport}</button><button id="bCalAll">${D.pro ? '' : '🔒 '}${T.calAll}</button></div>`;
     $('bBack').onclick = () => { route.pet = null; render(); };
     $('bEditPet').onclick = () => petForm(p);
+    $('bChatPet').onclick = () => window.Chat && Chat.open();
     document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { route.tab = b.dataset.tab; render(); });
     $('bPassport').onclick = () => D.pro ? passport(p) : openPro();
     $('bCalAll').onclick = () => { if (!D.pro) return openPro(); const items = upcomingFor([p]); if (items.length) downloadIcs(items, `${p.name}-recordatorios`); };
@@ -227,6 +229,6 @@
   }
   if ('Notification' in window && Notification.permission === 'default' && D.pets.length) Notification.requestPermission();
 
-  window.__pet = { D, render, downloadIcs, nextOf };
+  window.__pet = window.MiMascota = { D, T, render, downloadIcs, nextOf, upcomingFor, daysUntil, age, fmtD, ICON, todayStr };
   render(); notifyDue();
 })();

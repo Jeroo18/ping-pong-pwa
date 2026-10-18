@@ -4,6 +4,19 @@
 (function () {
   const T = I18N.strings(STRINGS);
   I18N.button(document.getElementById('bLang'));
+  if (window.ADS_NO_DEMO && !window.CrazyGames) T.ad = ''; // portal sin anuncios todavía: los botones dan el premio directo
+  Trophies.init({
+    game: 'nut-sort', title: 'Nut Sort', color: '#5b2fb8', button: document.getElementById('bTrophy'),
+    list: [
+      { id: 'lv5', tier: 'bronze', icon: '🔩', stat: 'levels', goal: 5, text: s => s.levels(5) },
+      { id: 'days3', tier: 'bronze', icon: '📅', stat: 'days', goal: 3, text: s => s.days(3) },
+      { id: 'lv20', tier: 'silver', icon: '⚙️', stat: 'levels', goal: 20, text: s => s.levels(20) },
+      { id: 'coins500', tier: 'silver', icon: '🪙', stat: 'coins', goal: 500, text: s => s.coins(500) },
+      { id: 'lv50', tier: 'gold', icon: '🏅', stat: 'levels', goal: 50, text: s => s.levels(50) },
+      { id: 'days7', tier: 'gold', icon: '🔥', stat: 'days', goal: 7, text: s => s.days(7) },
+      { id: 'lv100', tier: 'platinum', icon: '👑', stat: 'levels', goal: 100, text: s => s.levels(100) }
+    ]
+  });
   document.querySelectorAll('[data-t]').forEach(el => { el.textContent = T[el.dataset.t]; });
 
   const COLORS = ['#ff4d4d', '#3d7bff', '#ffd23d', '#2ecc71', '#a55eea', '#ff9f1a', '#ff6bcb', '#22d3ee', '#8d5524', '#b8f400', '#f5f5f5', '#1e2a78'];
@@ -14,6 +27,7 @@
   const save = JSON.parse(localStorage.getItem('nutsort') || '{}');
   const S = { level: save.level || 1, coins: save.coins || 0, theme: save.theme || 0, owned: save.owned || [0] };
   const persist = () => localStorage.setItem('nutsort', JSON.stringify(S));
+  Trophies.set('levels', S.level - 1);
 
   let bolts = [], history = [], selected = -1, undosLeft = FREE_UNDOS, extraUsed = false, busy = false;
 
@@ -153,6 +167,7 @@
     Ads.gameplayStop();
     reward = 10 + Math.floor(S.level / 5) * 5;
     S.coins += reward; S.level++; persist();
+    Trophies.set('levels', S.level - 1); Trophies.add('coins', reward);
     $('winTxt').textContent = T.earned(reward);
     $('bDouble').disabled = false;
     $('mWin').classList.add('show');
@@ -166,7 +181,7 @@
   };
   $('bDouble').onclick = async () => {
     $('bDouble').disabled = true;
-    if (await Ads.rewarded()) { S.coins += reward; persist(); $('winTxt').textContent = T.earned(reward * 2); render(); }
+    if (await Ads.rewarded()) { S.coins += reward; persist(); Trophies.add('coins', reward); $('winTxt').textContent = T.earned(reward * 2); render(); }
   };
   $('bUndo').onclick = async () => {
     if (!history.length) return toast(T.noUndo);

@@ -3,6 +3,20 @@
 (function () {
   const T = I18N.strings(STRINGS);
   I18N.floating();
+  if (window.ADS_NO_DEMO && !window.CrazyGames) T.ad = ''; // portal sin anuncios todavía: los botones dan el premio directo
+  Trophies.init({
+    game: 'merge-drop', title: 'Merge Planets', color: '#3a2f8f', floating: true,
+    list: [
+      { id: 'earth', tier: 'bronze', icon: '🌍', stat: 'planet', goal: 4, text: s => s.make(T.names[4]) },
+      { id: 'score1000', tier: 'bronze', icon: '⭐', stat: 'score', goal: 1000, text: s => s.score(1000) },
+      { id: 'plays10', tier: 'bronze', icon: '🎮', stat: 'plays', goal: 10, text: s => s.plays(10) },
+      { id: 'days3', tier: 'bronze', icon: '📅', stat: 'days', goal: 3, text: s => s.days(3) },
+      { id: 'saturn', tier: 'silver', icon: '🪐', stat: 'planet', goal: 7, text: s => s.make(T.names[7]) },
+      { id: 'score3000', tier: 'silver', icon: '🌠', stat: 'score', goal: 3000, text: s => s.score(3000) },
+      { id: 'sun', tier: 'gold', icon: '☀️', stat: 'planet', goal: 9, text: s => s.make(T.names[9]) },
+      { id: 'supernova', tier: 'platinum', icon: '💫', stat: 'supernova', goal: 1, text: () => T.trophySupernova }
+    ]
+  });
 
   const PLANETS = [
     ['#d9d9e0', '#8a8a99'], ['#c9a27e', '#7a5a3e'], ['#ff6a3d', '#9c2a10'], ['#ffd27a', '#c98a2a'], ['#3db4ff', '#1b6e3a'],
@@ -96,10 +110,12 @@
         const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
         if (a.l === MAX) {
           score += 1000; fx.push({ text: T.supernova, x: mx, y: my, t: 0, big: true }); tone(150, .6);
+          Trophies.add('supernova');
         } else {
           const l = a.l + 1, r = rad(l);
           bodies.push({ x: mx, y: my, px: mx, py: my + 1, r, l, age: 2 });
           score += POINTS[l];
+          Trophies.set('planet', l);
           fx.push({ text: `+${POINTS[l]}`, x: mx, y: my, t: 0 });
           tone(330 + l * 70, .12);
           if (l >= 6) Ads.happytime();
@@ -118,6 +134,7 @@
 
   function gameOver() {
     over = true; Ads.gameplayStop();
+    Trophies.set('score', score); Trophies.add('plays');
     const isBest = score > best;
     if (isBest) { best = score; localStorage.setItem('merge_best', best); }
     document.getElementById('tOver').textContent = isBest ? T.newBest : T.over;

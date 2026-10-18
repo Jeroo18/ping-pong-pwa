@@ -3,6 +3,21 @@
 (function () {
   const T = I18N.strings(STRINGS);
   I18N.floating();
+  if (window.ADS_NO_DEMO && !window.CrazyGames) T.ad = ''; // portal sin anuncios todavía: los botones dan el premio directo
+  Trophies.init({
+    game: 'block-burst', title: 'Block Burst', color: '#2b3b8f', floating: true,
+    list: [
+      { id: 'score500', tier: 'bronze', icon: '🟦', stat: 'score', goal: 500, text: s => s.score(500) },
+      { id: 'plays10', tier: 'bronze', icon: '🎮', stat: 'plays', goal: 10, text: s => s.plays(10) },
+      { id: 'days3', tier: 'bronze', icon: '📅', stat: 'days', goal: 3, text: s => s.days(3) },
+      { id: 'combo3', tier: 'silver', icon: '⚡', stat: 'combo', goal: 3, text: s => s.combo(3) },
+      { id: 'score2000', tier: 'silver', icon: '⭐', stat: 'score', goal: 2000, text: s => s.score(2000) },
+      { id: 'lines100', tier: 'silver', icon: '🧹', stat: 'lines', goal: 100, text: s => s.lines(100) },
+      { id: 'combo6', tier: 'gold', icon: '💥', stat: 'combo', goal: 6, text: s => s.combo(6) },
+      { id: 'score5000', tier: 'gold', icon: '🏅', stat: 'score', goal: 5000, text: s => s.score(5000) },
+      { id: 'score10000', tier: 'platinum', icon: '👑', stat: 'score', goal: 10000, text: s => s.score(10000) }
+    ]
+  });
 
   const N = 8;
   const COLORS = ['#ff5c5c', '#ffb030', '#ffe14d', '#4cd964', '#33c3ff', '#5b7bff', '#b45bff', '#ff6bc1'];
@@ -66,6 +81,7 @@
     const L = rows.length + cols.length;
     if (L) {
       combo++; sinceClear = 0;
+      Trophies.add('lines', L); Trophies.set('combo', combo);
       rows.forEach(i => { for (let j = 0; j < N; j++) burst(i, j, grid[i][j]); });
       cols.forEach(j => { for (let i = 0; i < N; i++) burst(i, j, grid[i][j]); });
       rows.forEach(i => { for (let j = 0; j < N; j++) grid[i][j] = -1; });
@@ -98,6 +114,7 @@
 
   async function gameOver() {
     over = true; Ads.gameplayStop();
+    Trophies.set('score', score); Trophies.add('plays');
     const isBest = score > best;
     if (isBest) { best = score; localStorage.setItem('blockburst_best', best); }
     document.getElementById('tOver').textContent = isBest ? T.newBest : T.over;
