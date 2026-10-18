@@ -15,6 +15,8 @@ html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-
 main{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 16px 96px}
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 header h1{font-size:20px;margin:0}
+.hr{display:flex;gap:8px;align-items:center}
+button.lang{font-size:16px;line-height:1;padding:5px 9px;border-radius:999px}
 .pro{font-size:12px;font-weight:800;background:linear-gradient(90deg,#ffd36e,#ff8ad8);color:#111;border-radius:999px;padding:5px 10px;border:0;cursor:pointer}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
 .ring{position:relative;width:240px;height:240px;margin:6px auto 10px}
@@ -63,7 +65,7 @@ h3{margin:0 0 8px;font-size:16px}
 </head>
 <body>
 <main>
-  <header><h1>🎯 Enfoque</h1><button class="pro" id="bPro">PRO</button></header>
+  <header><h1>🎯 <span id="appName">Enfoque</span></h1><div class="hr"><button class="lang" id="bLang"></button><button class="pro" id="bPro">PRO</button></div></header>
 
   <section class="tab on" id="tabFocus">
     <div class="card">
@@ -124,6 +126,8 @@ h3{margin:0 0 8px;font-size:16px}
   <div class="row"><button id="bClosePro" data-t="close"></button></div>
 </div></div>
 
+<script src="lang.js"></script>
+<script src="strings.js"></script>
 <script src="app.js"></script>
 <script>if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js')</script>
 </body>

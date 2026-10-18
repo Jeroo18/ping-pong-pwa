@@ -5,36 +5,8 @@
   const CHECKOUT = { yearly: '', lifetime: '' };
   const FREE_PETS = 1;
 
-  const es = (navigator.language || 'es').toLowerCase().startsWith('es');
-  const T = es ? {
-    app: 'Mi Mascota', upcoming: 'Próximos', noUpcoming: 'Nada pendiente. ¡Todo al día! 🐾', addPet: 'Añadir mascota', newPet: 'Nueva mascota', editPet: 'Editar mascota',
-    name: 'Nombre', species: 'Especie', breed: 'Raza', birth: 'Nacimiento', photo: 'Foto', save: 'Guardar', cancel: 'Cancelar', del: 'Eliminar', sureDel: '¿Eliminar? No se puede deshacer.',
-    dog: 'Perro', cat: 'Gato', other: 'Otro', years: n => n < 1 ? 'menos de 1 año' : `${n} año${n > 1 ? 's' : ''}`,
-    tabs: { up: 'Próximos', vaccine: 'Vacunas', med: 'Tratamientos', visit: 'Visitas', weight: 'Peso' },
-    add: { vaccine: 'Nueva vacuna', med: 'Nuevo tratamiento', visit: 'Nueva visita', weight: 'Nuevo peso' },
-    vName: 'Vacuna (ej.: Rabia, Séxtuple)', applied: 'Fecha aplicada', nextDue: 'Próxima dosis', mName: 'Tratamiento (ej.: antipulgas, desparasitante)', dose: 'Dosis',
-    lastGiven: 'Última vez', every: 'Repetir cada (días)', reason: 'Motivo', notes: 'Notas', date: 'Fecha', kg: 'Peso (kg)', clinic: 'Veterinaria',
-    overdue: n => `Vencido hace ${n} d`, today: 'Hoy', inDays: n => `En ${n} d`, done: 'Hecho', toCal: '📅', calAll: '📅 Todo al calendario',
-    empty: 'Aún no hay registros.', passport: '🖨 Pasaporte de salud', backup: 'Copia de seguridad', export: 'Exportar', import: 'Importar', imported: 'Datos importados',
-    proTitle: '✨ Mi Mascota PRO', pro: ['Mascotas ilimitadas', 'Pasaporte de salud para imprimir o PDF', 'Exportar todos los recordatorios al calendario', 'Apoyas a un desarrollador independiente'],
-    yearly: 'Anual', lifetime: 'De por vida', close: 'Cerrar', noPay: 'Los pagos aún no están configurados en esta versión.', proOn: 'PRO activado. ¡Gracias!',
-    reminder: (p, n) => `${p}: ${n}`, ageLbl: 'Edad', weightLbl: 'Último peso', given: 'Aplicado', due: 'Próxima'
-  } : {
-    app: 'My Pet', upcoming: 'Upcoming', noUpcoming: 'Nothing due. All up to date! 🐾', addPet: 'Add pet', newPet: 'New pet', editPet: 'Edit pet',
-    name: 'Name', species: 'Species', breed: 'Breed', birth: 'Birthday', photo: 'Photo', save: 'Save', cancel: 'Cancel', del: 'Delete', sureDel: 'Delete? This cannot be undone.',
-    dog: 'Dog', cat: 'Cat', other: 'Other', years: n => n < 1 ? 'under 1 year' : `${n} year${n > 1 ? 's' : ''}`,
-    tabs: { up: 'Upcoming', vaccine: 'Vaccines', med: 'Treatments', visit: 'Vet visits', weight: 'Weight' },
-    add: { vaccine: 'New vaccine', med: 'New treatment', visit: 'New visit', weight: 'New weight' },
-    vName: 'Vaccine (e.g. Rabies, DHPP)', applied: 'Date given', nextDue: 'Next dose', mName: 'Treatment (e.g. flea & tick, dewormer)', dose: 'Dose',
-    lastGiven: 'Last given', every: 'Repeat every (days)', reason: 'Reason', notes: 'Notes', date: 'Date', kg: 'Weight (kg)', clinic: 'Clinic',
-    overdue: n => `Overdue ${n} d`, today: 'Today', inDays: n => `In ${n} d`, done: 'Done', toCal: '📅', calAll: '📅 All to calendar',
-    empty: 'No records yet.', passport: '🖨 Health passport', backup: 'Backup', export: 'Export', import: 'Import', imported: 'Data imported',
-    proTitle: '✨ My Pet PRO', pro: ['Unlimited pets', 'Printable / PDF health passport', 'Export every reminder to your calendar', 'Support an indie developer'],
-    yearly: 'Yearly', lifetime: 'Lifetime', close: 'Close', noPay: 'Payments are not configured in this build yet.', proOn: 'PRO unlocked. Thank you!',
-    reminder: (p, n) => `${p}: ${n}`, ageLbl: 'Age', weightLbl: 'Last weight', given: 'Given', due: 'Next'
-  };
-  document.documentElement.lang = es ? 'es' : 'en';
-  document.title = `${T.app} — ${es ? 'Salud de tu perro y gato' : 'Pet health tracker'}`;
+  const T = I18N.strings(STRINGS);
+  document.title = `${T.app} — ${T.tagline}`;
 
   const D = Object.assign({ pro: false, pets: [] }, JSON.parse(localStorage.getItem('mimascota') || '{}'));
   const save = () => localStorage.setItem('mimascota', JSON.stringify(D));
@@ -46,7 +18,7 @@
   const ICON = { dog: '🐶', cat: '🐱', other: '🐾', vaccine: '💉', med: '💊', visit: '🩺', weight: '⚖️' };
   const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
-  const fmtD = s => s ? parse(s).toLocaleDateString(es ? 'es' : 'en', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  const fmtD = s => s ? parse(s).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const daysUntil = s => Math.round((parse(s) - parse(todayStr())) / 86400000);
   const nextOf = r => r.type === 'vaccine' ? r.next : r.type === 'med' && r.every ? addDays(r.date, +r.every) : null;
@@ -74,7 +46,7 @@
     $('fab').hidden = true;
     const up = upcomingFor(D.pets).filter(x => daysUntil(x.next) <= 30);
     $('view').innerHTML = `
-      <header><h1>🐾 ${T.app}</h1><button class="pro" id="bPro">${D.pro ? 'PRO ✓' : 'PRO'}</button></header>
+      <header><h1>🐾 ${T.app}</h1><button class="lang" id="bLang"></button><button class="pro" id="bPro">${D.pro ? 'PRO ✓' : 'PRO'}</button></header>
       <div class="pets">
         ${D.pets.map(p => `<div class="card pet" data-pet="${p.id}">${avatar(p)}<b>${esc(p.name)}</b><small>${esc(p.breed || T[p.species] || '')}${p.birth ? ' · ' + age(p.birth) : ''}</small></div>`).join('')}
         <button class="card pet add" id="bAddPet"><div class="avatar">+</div>${T.addPet}</button>
@@ -86,6 +58,7 @@
     document.querySelectorAll('[data-pet]').forEach(el => el.onclick = () => { route = { pet: el.dataset.pet, tab: 'up' }; render(); });
     $('bAddPet').onclick = () => (!D.pro && D.pets.length >= FREE_PETS) ? openPro() : petForm();
     $('bPro').onclick = openPro;
+    I18N.button($('bLang'));
     $('bExport').onclick = exportJson; $('bImport').onclick = () => $('fileIn').click();
     bindRows();
   }
@@ -95,7 +68,7 @@
     const title = r.type === 'weight' ? `${r.kg} kg` : esc(r.name);
     const sub = showPet ? `${esc(p.name)} · ${fmtD(n)}`
       : r.type === 'vaccine' ? `${T.given}: ${fmtD(r.date)}${n ? ` · ${T.due}: ${fmtD(n)}` : ''}`
-      : r.type === 'med' ? `${esc(r.dose || '')} ${r.every ? `· ${es ? 'cada' : 'every'} ${r.every} d` : ''} · ${fmtD(r.date)}`
+      : r.type === 'med' ? `${esc(r.dose || '')} ${r.every ? `· ${T.everyN(r.every)}` : ''} · ${fmtD(r.date)}`
       : `${fmtD(r.date)}${r.notes ? ' · ' + esc(r.notes) : ''}`;
     const actions = n ? `<div class="acts"><button class="sm" data-done="${p.id}|${r.id}" aria-label="${T.done}">✓</button><button class="sm" data-cal="${p.id}|${r.id}">${T.toCal}</button></div>` : '';
     return `<div class="item"><div class="ic">${showPet ? avatarMini(p) : ICON[r.type]}</div><div class="b" data-edit="${p.id}|${r.id}"><b>${showPet ? ICON[r.type] + ' ' : ''}${title}</b><small>${sub}</small>${n ? status(n) : ''}</div>${actions}</div>`;

@@ -5,31 +5,9 @@
   // Pega aquí tus enlaces de pago de Stripe. Configura su "URL de éxito" como https://TU-SITIO/enfoque/?pro=1
   const CHECKOUT = { monthly: '', yearly: '' };
 
-  const es = (navigator.language || 'es').toLowerCase().startsWith('es');
-  const T = es ? {
-    task: '¿En qué vas a trabajar ahora?', start: 'Empezar', pause: 'Pausa', resume: 'Seguir', focus: 'Enfoque', brk: 'Descanso',
-    stepsTitle: 'Divide la tarea en mini-pasos', stepsHelp: 'Pasos tan pequeños que no dé pereza empezar (2–5 min cada uno).', stepPh: 'Ej.: abrir el documento',
-    soundTitle: 'Sonido de fondo', volume: 'Volumen', habitsTitle: 'Hábitos diarios', habitPh: 'Ej.: tomar agua, medicación…',
-    habitsFree: n => `Versión gratis: hasta ${n} hábitos. PRO = ilimitados.`, habitsPro: 'Marca cada hábito al cumplirlo hoy.',
-    today: 'min hoy', streak: 'días seguidos', sessions: 'sesiones', week: 'Últimos 7 días (min)', backup: 'Copia de seguridad', export: 'Exportar', import: 'Importar',
-    navFocus: 'Enfocar', navHabits: 'Hábitos', navStats: 'Progreso', monthly: 'Mensual', yearly: 'Anual', close: 'Cerrar',
-    custom: 'Otro', customAsk: 'Minutos de enfoque:', doneTitle: '¡Sesión terminada! 🎉', doneBody: 'Tómate un descanso corto.', breakDone: 'Descanso terminado. ¿Otra ronda?',
-    pro: ['Sonidos extra: rosa, blanco, lluvia y binaural 40 Hz', 'Hábitos ilimitados', 'Duración personalizada', 'Apoyas a un desarrollador independiente'],
-    noPay: 'Los pagos aún no están configurados en esta versión.', proOn: 'PRO activado. ¡Gracias!', days: ['D', 'L', 'M', 'X', 'J', 'V', 'S'], streakDays: n => `🔥 ${n}`,
-    sounds: { off: 'Silencio', brown: 'Marrón', pink: 'Rosa', white: 'Blanco', rain: 'Lluvia', bin40: '40 Hz' }, needPro: 'Disponible en PRO', imported: 'Datos importados'
-  } : {
-    task: 'What are you working on now?', start: 'Start', pause: 'Pause', resume: 'Resume', focus: 'Focus', brk: 'Break',
-    stepsTitle: 'Break the task into tiny steps', stepsHelp: 'Steps so small they are easy to start (2–5 min each).', stepPh: 'e.g. open the document',
-    soundTitle: 'Background sound', volume: 'Volume', habitsTitle: 'Daily habits', habitPh: 'e.g. drink water, meds…',
-    habitsFree: n => `Free version: up to ${n} habits. PRO = unlimited.`, habitsPro: 'Check each habit when done today.',
-    today: 'min today', streak: 'day streak', sessions: 'sessions', week: 'Last 7 days (min)', backup: 'Backup', export: 'Export', import: 'Import',
-    navFocus: 'Focus', navHabits: 'Habits', navStats: 'Progress', monthly: 'Monthly', yearly: 'Yearly', close: 'Close',
-    custom: 'Custom', customAsk: 'Focus minutes:', doneTitle: 'Session complete! 🎉', doneBody: 'Take a short break.', breakDone: 'Break is over. Another round?',
-    pro: ['Extra sounds: pink, white, rain and 40 Hz binaural', 'Unlimited habits', 'Custom durations', 'Support an indie developer'],
-    noPay: 'Payments are not configured in this build yet.', proOn: 'PRO unlocked. Thank you!', days: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], streakDays: n => `🔥 ${n}`,
-    sounds: { off: 'Off', brown: 'Brown', pink: 'Pink', white: 'White', rain: 'Rain', bin40: '40 Hz' }, needPro: 'Available in PRO', imported: 'Data imported'
-  };
-  document.documentElement.lang = es ? 'es' : 'en';
+  const T = I18N.strings(STRINGS);
+  I18N.button(document.getElementById('bLang'));
+  document.getElementById('appName').textContent = T.app;
   document.querySelectorAll('[data-t]').forEach(el => { el.textContent = T[el.dataset.t]; });
   const $ = id => document.getElementById(id);
   $('task').placeholder = T.task; $('stepIn').placeholder = T.stepPh; $('habitIn').placeholder = T.habitPh;
@@ -51,7 +29,7 @@
     $('arc').style.strokeDashoffset = ARC * (1 - remaining / total);
     $('arc').style.stroke = phase === 'focus' ? 'url(#g)' : '#ffb454';
     $('bStart').textContent = running ? T.pause : (remaining < total ? T.resume : T.start);
-    document.title = running ? `${fmt(remaining)} · Enfoque` : 'Enfoque — Focus timer';
+    document.title = running ? `${fmt(remaining)} · ${T.app}` : `${T.app} — ${T.tagline}`;
   }
   function loop() {
     remaining = (endAt - Date.now()) / 1000;

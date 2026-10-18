@@ -1,10 +1,8 @@
 // Merge Planets — suelta planetas, dos iguales se fusionan en el siguiente. Meta: crear el Sol.
 // Física Verlet propia (sin librerías) para que pese poco y cargue rápido en portales web.
 (function () {
-  const es = (navigator.language || 'es').toLowerCase().startsWith('es');
-  const T = es ? { best: 'Récord', next: 'Siguiente', over: 'Se llenó el espacio', newBest: '¡Nuevo récord!', revive: 'Limpiar y seguir', again: 'Jugar de nuevo', ad: 'anuncio', bestTxt: b => `Récord: ${b}`, names: ['Luna', 'Mercurio', 'Marte', 'Venus', 'Tierra', 'Neptuno', 'Urano', 'Saturno', 'Júpiter', 'Sol'], supernova: '¡SUPERNOVA!' }
-    : { best: 'Best', next: 'Next', over: 'Space is full', newBest: 'New best!', revive: 'Clear & continue', again: 'Play again', ad: 'ad', bestTxt: b => `Best: ${b}`, names: ['Moon', 'Mercury', 'Mars', 'Venus', 'Earth', 'Neptune', 'Uranus', 'Saturn', 'Jupiter', 'Sun'], supernova: 'SUPERNOVA!' };
-  document.documentElement.lang = es ? 'es' : 'en';
+  const T = I18N.strings(STRINGS);
+  I18N.floating();
 
   const PLANETS = [
     ['#d9d9e0', '#8a8a99'], ['#c9a27e', '#7a5a3e'], ['#ff6a3d', '#9c2a10'], ['#ffd27a', '#c98a2a'], ['#3db4ff', '#1b6e3a'],

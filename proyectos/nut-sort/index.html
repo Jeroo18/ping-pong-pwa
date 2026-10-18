@@ -19,6 +19,8 @@ body.theme-3{--bg1:#0b1f3b;--bg2:#1a4f8a}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 4px}
 .pill{background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px}
 h1{font-size:18px;margin:0}
+.hr{display:flex;gap:6px;align-items:center}
+button.lang{color:#fff;box-shadow:none;padding:6px 10px;font-size:16px;line-height:1}
 #board{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px 6px;padding:8px}
 .bolt{position:relative;width:62px;display:flex;flex-direction:column-reverse;align-items:center;padding-bottom:10px;cursor:pointer;transition:transform .15s}
 .bolt::before{content:"";position:absolute;bottom:10px;width:10px;top:-6px;border-radius:5px;background:linear-gradient(90deg,#9aa,#eef,#9aa);z-index:0}
@@ -47,9 +49,9 @@ button small{display:block;font-size:10px;opacity:.75}
 <body>
 <div id="app">
   <header>
-    <span class="pill" id="lvl">Nivel 1</span>
+    <span class="pill" id="lvl"></span>
     <h1>Nut Sort</h1>
-    <span class="pill" id="coins">🪙 0</span>
+    <span class="hr"><button class="pill lang" id="bLang"></button><span class="pill" id="coins">🪙 0</span></span>
   </header>
   <div id="board" aria-label="tablero"></div>
   <footer>
@@ -74,6 +76,8 @@ button small{display:block;font-size:10px;opacity:.75}
   <div class="row"><button class="ghost" id="bCloseShop" data-t="close"></button></div>
 </div></div>
 <div class="toast" id="toast"></div>
+<script src="lang.js"></script>
+<script src="strings.js"></script>
 <script src="ads.js"></script>
 <script src="game.js"></script>
 <script>if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js')</script>

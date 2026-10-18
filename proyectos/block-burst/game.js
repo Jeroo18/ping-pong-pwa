@@ -1,10 +1,8 @@
 // Block Burst — puzzle de bloques 8x8 (género tipo Block Blast).
 // Arrastra las 3 piezas al tablero, completa filas/columnas, encadena combos.
 (function () {
-  const es = (navigator.language || 'es').toLowerCase().startsWith('es');
-  const T = es ? { score: 'Puntos', best: 'Récord', over: 'Sin espacio', revive: 'Continuar', again: 'Jugar de nuevo', ad: 'anuncio', bestTxt: b => `Récord: ${b}`, newBest: '¡Nuevo récord!', combo: 'Combo', great: ['¡Bien!', '¡Genial!', '¡Increíble!', '¡Brutal!'] }
-    : { score: 'Score', best: 'Best', over: 'No space left', revive: 'Continue', again: 'Play again', ad: 'ad', bestTxt: b => `Best: ${b}`, newBest: 'New best!', combo: 'Combo', great: ['Good!', 'Great!', 'Amazing!', 'Unreal!'] };
-  document.documentElement.lang = es ? 'es' : 'en';
+  const T = I18N.strings(STRINGS);
+  I18N.floating();
 
   const N = 8;
   const COLORS = ['#ff5c5c', '#ffb030', '#ffe14d', '#4cd964', '#33c3ff', '#5b7bff', '#b45bff', '#ff6bc1'];

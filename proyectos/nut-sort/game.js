@@ -2,19 +2,8 @@
 // Niveles generados con semilla (siempre los mismos) y verificados con un solucionador,
 // así ningún nivel sale imposible. El mismo solucionador da las pistas.
 (function () {
-  const es = (navigator.language || 'es').toLowerCase().startsWith('es');
-  const T = es ? {
-    undo: 'Deshacer', ad: 'anuncio', win: '¡Nivel completado!', next: 'Siguiente', shop: 'Temas',
-    close: 'Cerrar', level: 'Nivel', earned: n => `Ganaste ${n} 🪙`, noUndo: 'Nada que deshacer',
-    noCoins: 'Te faltan monedas', stuck: 'Sin salida: deshaz o añade un tornillo', boltAdded: 'Tornillo extra añadido',
-    oneBolt: 'Solo un tornillo extra por nivel', buy: p => `${p} 🪙`, owned: 'Usar', themes: ['Morado', 'Bosque', 'Madera', 'Océano']
-  } : {
-    undo: 'Undo', ad: 'ad', win: 'Level complete!', next: 'Next', shop: 'Themes',
-    close: 'Close', level: 'Level', earned: n => `You earned ${n} 🪙`, noUndo: 'Nothing to undo',
-    noCoins: 'Not enough coins', stuck: 'No moves: undo or add a bolt', boltAdded: 'Extra bolt added',
-    oneBolt: 'Only one extra bolt per level', buy: p => `${p} 🪙`, owned: 'Use', themes: ['Purple', 'Forest', 'Wood', 'Ocean']
-  };
-  document.documentElement.lang = es ? 'es' : 'en';
+  const T = I18N.strings(STRINGS);
+  I18N.button(document.getElementById('bLang'));
   document.querySelectorAll('[data-t]').forEach(el => { el.textContent = T[el.dataset.t]; });
 
   const COLORS = ['#ff4d4d', '#3d7bff', '#ffd23d', '#2ecc71', '#a55eea', '#ff9f1a', '#ff6bcb', '#22d3ee', '#8d5524', '#b8f400', '#f5f5f5', '#1e2a78'];
@@ -102,7 +91,7 @@
   function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 1600); }
 
   function render() {
-    $('lvl').textContent = `${T.level} ${S.level}`;
+    $('lvl').textContent = T.level(S.level);
     $('coins').textContent = `🪙 ${S.coins}`;
     $('undoLeft').textContent = undosLeft > 0 ? `${undosLeft}` : T.ad;
     document.body.className = 'theme-' + S.theme;
