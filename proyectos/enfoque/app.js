@@ -1,9 +1,11 @@
 // Enfoque — temporizador + ruido marrón + mini-pasos para TDAH.
-// Todo se guarda en el teléfono (localStorage). Plan PRO con enlaces de pago (Stripe Payment Links)
-// en la web, o Google Play Billing (RevenueCat) cuando se empaquete como app.
+// Todo se guarda en el teléfono (localStorage). Plan PRO con pago en Lemon Squeezy y clave de
+// licencia comprobada por la app (../shared/license.js).
 (function () {
-  // Pega aquí tus enlaces de pago de Stripe. Configura su "URL de éxito" como https://TU-SITIO/enfoque/?pro=1
+  // Enlaces de pago de Lemon Squeezy (uno por variante). El botón tras pagar lleva a ?pro=1,
+  // que abre la caja para pegar la clave de licencia.
   const CHECKOUT = { monthly: '', yearly: '' };
+  const STORE_ID = ''; // ID numérico de la tienda en Lemon Squeezy: así solo valen claves de tu tienda
 
   const T = I18N.strings(STRINGS);
   I18N.button(document.getElementById('bLang'));
@@ -16,7 +18,10 @@
   const PRO_SOUNDS = ['pink', 'white', 'rain', 'bin40'];
   const D = Object.assign({ pro: false, task: '', steps: [], habits: [], log: {}, sessions: 0, minutes: 25 }, JSON.parse(localStorage.getItem('enfoque') || '{}'));
   const save = () => localStorage.setItem('enfoque', JSON.stringify(D));
-  if (new URLSearchParams(location.search).get('pro') === '1') { D.pro = true; save(); history.replaceState(null, '', location.pathname); setTimeout(() => alert(T.proOn), 300); }
+  const lic = LICENSE.create({ app: 'enfoque', product: 'Enfoque PRO', storeId: STORE_ID, onChange: pro => { D.pro = pro; save(); $('bPro').textContent = pro ? 'PRO ✓' : 'PRO'; renderAll(); } });
+  D.pro = lic.pro; save();
+  const askKey = new URLSearchParams(location.search).get('pro') === '1';
+  if (askKey) history.replaceState(null, '', location.pathname);
   const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   // ---------- Temporizador ----------
@@ -180,9 +185,9 @@
   $('fileIn').onchange = async e => { try { const x = JSON.parse(await e.target.files[0].text()); const pro = D.pro; Object.assign(D, x, { pro: pro || false }); save(); renderAll(); alert(T.imported); } catch (err) {} };
 
   // ---------- PRO ----------
-  function openPro() { $('proList').innerHTML = T.pro.map(p => `<li>✓ <span>${p}</span></li>`).join(''); $('mPro').classList.add('show'); }
+  function openPro(focusKey) { $('proList').innerHTML = T.pro.map(p => `<li>✓ <span>${p}</span></li>`).join(''); lic.mount($('licBox'), focusKey === true); $('mPro').classList.add('show'); }
   function checkout(plan) { if (CHECKOUT[plan]) location.href = CHECKOUT[plan]; else alert(T.noPay); }
-  $('bPro').onclick = openPro; $('bClosePro').onclick = () => $('mPro').classList.remove('show');
+  $('bPro').onclick = () => openPro(); $('bClosePro').onclick = () => $('mPro').classList.remove('show');
   $('bMonthly').onclick = () => checkout('monthly'); $('bYearly').onclick = () => checkout('yearly');
   if (D.pro) $('bPro').textContent = 'PRO ✓';
 
@@ -196,4 +201,6 @@
   function renderAll() { setPhase('focus', D.minutes); renderPresets(); renderSteps(); renderHabits(); renderSounds(); renderStats(); }
   window.__enf = { D, finish, playSound, get remaining() { return remaining; } };
   renderAll();
+  if (askKey) openPro(true);
+  lic.refresh();
 })();

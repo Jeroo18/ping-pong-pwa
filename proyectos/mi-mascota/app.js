@@ -1,8 +1,10 @@
 // Mi Mascota — historial de salud de mascotas con recordatorios en el calendario del teléfono (.ics).
-// Sin servidor: los datos viven en el teléfono. PRO por enlaces de pago (web) o Play Billing (app).
+// Sin servidor: los datos viven en el teléfono. PRO con pago en Lemon Squeezy y clave de licencia (../shared/license.js).
 (function () {
-  // Pega aquí tus enlaces de pago de Stripe. URL de éxito: https://TU-SITIO/mi-mascota/?pro=1
+  // Enlaces de pago de Lemon Squeezy (uno por variante). El botón tras pagar lleva a ?pro=1,
+  // que abre la caja para pegar la clave de licencia.
   const CHECKOUT = { yearly: '', lifetime: '' };
+  const STORE_ID = ''; // ID numérico de la tienda en Lemon Squeezy: así solo valen claves de tu tienda
   const FREE_PETS = 1;
 
   const T = I18N.strings(STRINGS);
@@ -10,7 +12,10 @@
 
   const D = Object.assign({ pro: false, pets: [] }, JSON.parse(localStorage.getItem('mimascota') || '{}'));
   const save = () => localStorage.setItem('mimascota', JSON.stringify(D));
-  if (new URLSearchParams(location.search).get('pro') === '1') { D.pro = true; save(); history.replaceState(null, '', location.pathname); setTimeout(() => alert(T.proOn), 300); }
+  const lic = LICENSE.create({ app: 'mimascota', product: 'Mi Mascota PRO', storeId: STORE_ID, onChange: pro => { D.pro = pro; save(); render(); } });
+  D.pro = lic.pro; save();
+  const askKey = new URLSearchParams(location.search).get('pro') === '1';
+  if (askKey) history.replaceState(null, '', location.pathname);
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -210,11 +215,12 @@
   }
 
   // ---------- PRO y copias ----------
-  function openPro() {
+  function openPro(focusKey) {
     $('sheet').innerHTML = `<h3>${T.proTitle}</h3>${T.pro.map(x => `<div class="item"><div class="ic">✓</div><div class="b">${x}</div></div>`).join('')}
-      <div class="price"><button id="pY"><span>${T.yearly}</span><small>US$9.99</small></button><button id="pL" class="main"><span>${T.lifetime}</span><small style="color:#fff">US$19.99</small></button></div>
+      <div class="price"><button id="pY"><span>${T.yearly}</span><small>US$9.99</small></button><button id="pL" class="main"><span>${T.lifetime}</span><small style="color:#fff">US$19.99</small></button></div><div id="licBox"></div>
       <p style="font-size:12px;text-align:center;opacity:.7;margin:8px 0"><a style="color:inherit" href="../legal/terminos.html" target="_blank">Términos / Terms</a> · <a style="color:inherit" href="../legal/privacidad.html" target="_blank">Privacidad / Privacy</a> · <a style="color:inherit" href="../legal/reembolsos.html" target="_blank">Reembolsos / Refunds</a></p>
       <div class="btns"><button id="pClose">${T.close}</button></div>`;
+    lic.mount($('licBox'), focusKey === true);
     $('modal').classList.add('show');
     const go = k => CHECKOUT[k] ? (location.href = CHECKOUT[k]) : alert(T.noPay);
     $('pY').onclick = () => go('yearly'); $('pL').onclick = () => go('lifetime'); $('pClose').onclick = close;
@@ -232,4 +238,6 @@
 
   window.__pet = window.MiMascota = { D, T, render, downloadIcs, nextOf, upcomingFor, daysUntil, age, fmtD, ICON, todayStr };
   render(); notifyDue();
+  if (askKey) openPro(true);
+  lic.refresh();
 })();
