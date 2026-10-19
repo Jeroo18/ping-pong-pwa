@@ -4,7 +4,7 @@
   // Enlaces de pago de Lemon Squeezy (uno por variante). El botón tras pagar lleva a ?pro=1,
   // que abre la caja para pegar la clave de licencia.
   const CHECKOUT = { yearly: '', lifetime: '' };
-  const STORE_ID = ''; // ID numérico de la tienda en Lemon Squeezy: así solo valen claves de tu tienda
+  const STORE_ID = '502156'; // ID numérico de la tienda en Lemon Squeezy: así solo valen claves de tu tienda
   const FREE_PETS = 1;
 
   const T = I18N.strings(STRINGS);

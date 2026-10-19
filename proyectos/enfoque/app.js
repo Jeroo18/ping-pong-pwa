@@ -4,8 +4,11 @@
 (function () {
   // Enlaces de pago de Lemon Squeezy (uno por variante). El botón tras pagar lleva a ?pro=1,
   // que abre la caja para pegar la clave de licencia.
-  const CHECKOUT = { monthly: '', yearly: '' };
-  const STORE_ID = ''; // ID numérico de la tienda en Lemon Squeezy: así solo valen claves de tu tienda
+  const CHECKOUT = { // modo de prueba (test mode): cambiar por los de modo real al publicar
+    monthly: 'https://bettergoalssoftware.lemonsqueezy.com/checkout/buy/44a94fc5-a462-4b45-ab1d-1bd020227452',
+    yearly: 'https://bettergoalssoftware.lemonsqueezy.com/checkout/buy/ed38bd98-ea1a-4613-a318-248b25aa1efd'
+  };
+  const STORE_ID = '502156'; // ID numérico de la tienda en Lemon Squeezy: así solo valen claves de tu tienda
 
   const T = I18N.strings(STRINGS);
   I18N.button(document.getElementById('bLang'));
