@@ -1,0 +1,4 @@
+[
+ {"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"com.bettergoalsoftware.enfoque","sha256_cert_fingerprints":["E5:3C:69:5B:8F:59:98:73:4F:4E:B5:A8:0B:8E:1F:40:FB:C5:19:90:96:3E:73:B8:70:61:00:19:D8:1C:D6:DD"]}},
+ {"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"com.bettergoalsoftware.mimascota","sha256_cert_fingerprints":["E5:3C:69:5B:8F:59:98:73:4F:4E:B5:A8:0B:8E:1F:40:FB:C5:19:90:96:3E:73:B8:70:61:00:19:D8:1C:D6:DD"]}}
+]

@@ -9,6 +9,21 @@
   const RECHECK_MS = 24 * 3600 * 1000;       // comprobar una vez al día
   const OFFLINE_GRACE_MS = 14 * 24 * 3600 * 1000; // sin internet, PRO sigue hasta 14 días
 
+  // Dentro de la app Android (Google Play) no se puede enlazar a pagos fuera de Play: se ocultan
+  // los botones de precio y solo queda la caja para pegar una clave comprada en la web.
+  // La app abre ?src=android; se recuerda por pestaña (sessionStorage), no en el navegador normal.
+  let ANDROID = false;
+  try {
+    if (/[?&]src=android\b/.test(location.search) || /^android-app:\/\//.test(document.referrer)) sessionStorage.setItem('android-app', '1');
+    ANDROID = sessionStorage.getItem('android-app') === '1';
+  } catch (e) {}
+  if (ANDROID) {
+    document.documentElement.classList.add('android-app');
+    const st = document.createElement('style');
+    st.textContent = '.android-app .price{display:none!important}';
+    document.head.appendChild(st);
+  }
+
   const S = {
     en: { have: 'Already bought? Paste your license key', hint: 'You received it by email after paying.', ph: 'License key', btn: 'Activate', checking: 'Checking…', ok: 'PRO unlocked. Thank you!', bad: 'That key is not valid.', other: 'That key belongs to another product.', expired: 'That key is expired or disabled.', limit: 'That key is already active on the maximum number of devices.', net: 'No connection. Try again with internet.', active: 'PRO active', off: 'Your PRO license is no longer active.' },
     es: { have: '¿Ya compraste? Pega tu clave de licencia', hint: 'Te llegó por correo después de pagar.', ph: 'Clave de licencia', btn: 'Activar', checking: 'Comprobando…', ok: 'PRO activado. ¡Gracias!', bad: 'Esa clave no es válida.', other: 'Esa clave es de otro producto.', expired: 'Esa clave está vencida o desactivada.', limit: 'Esa clave ya está activa en el máximo de dispositivos.', net: 'Sin conexión. Inténtalo de nuevo con internet.', active: 'PRO activo', off: 'Tu licencia PRO ya no está activa.' },
@@ -118,5 +133,5 @@
     return lic;
   }
 
-  window.LICENSE = { create };
+  window.LICENSE = { create, android: ANDROID };
 })();
