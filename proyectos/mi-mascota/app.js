@@ -213,6 +213,7 @@
   function openPro() {
     $('sheet').innerHTML = `<h3>${T.proTitle}</h3>${T.pro.map(x => `<div class="item"><div class="ic">✓</div><div class="b">${x}</div></div>`).join('')}
       <div class="price"><button id="pY"><span>${T.yearly}</span><small>US$9.99</small></button><button id="pL" class="main"><span>${T.lifetime}</span><small style="color:#fff">US$19.99</small></button></div>
+      <p style="font-size:12px;text-align:center;opacity:.7;margin:8px 0"><a style="color:inherit" href="../legal/terminos.html" target="_blank">Términos / Terms</a> · <a style="color:inherit" href="../legal/privacidad.html" target="_blank">Privacidad / Privacy</a> · <a style="color:inherit" href="../legal/reembolsos.html" target="_blank">Reembolsos / Refunds</a></p>
       <div class="btns"><button id="pClose">${T.close}</button></div>`;
     $('modal').classList.add('show');
     const go = k => CHECKOUT[k] ? (location.href = CHECKOUT[k]) : alert(T.noPay);
