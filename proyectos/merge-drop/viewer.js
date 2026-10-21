@@ -100,7 +100,7 @@
     if (!f.star) add(f.rings ? U.yes : U.no, U.rings);
     const ratio = Math.pow(f.d / F[4].d, 3);
     const big = idx === 4 ? '' : ratio > 1.5 ? U.fits(sig(ratio)) : U.fitsIn(sig(1 / ratio, 2));
-    return `<div class="pv-grid">${a.join('')}</div>${big ? `<div class="pv-big">${esc(big)}</div>` : ''}<div class="pv-src">${esc(U.src)} · ${esc(U.sizeOrder)}</div>`;
+    return `<div class="pv-grid">${a.join('')}</div>${big ? `<div class="pv-big">${esc(big)}</div>` : ''}<div class="pv-src">${esc(U.src)} · ${esc(U.sizeOrder)}</div><div class="pv-src">3D: Solar System Scope (CC BY 4.0) · PixiJS (MIT)</div>`;
   }
   const note = () => (PLANETS.TEXT[lang] ? '' : `<div class="pv-note">${esc(U.textIn)}</div>`);
   function story() {
