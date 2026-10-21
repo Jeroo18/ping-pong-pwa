@@ -4,14 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0a0a24">
-<meta name="description" content="Merge Planets: suelta planetas, junta dos iguales y crea el Sol. Juego de fusión con física.">
+<meta name="description" content="Merge Planets: suelta planetas en 3D, junta dos iguales y crea el Sol. Aprende sobre cada planeta con datos y fotos de la NASA.">
 <title>Merge Planets — Drop &amp; Merge</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;height:100%;background:radial-gradient(ellipse at top,#26205e,#0a0a24 70%);color:#fff;font-family:Fredoka,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:none}
-canvas{display:block;width:100vw;height:100vh;height:100dvh}
+canvas#c{display:block;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh}
+#hud{position:fixed;z-index:2;text-align:center;pointer-events:none;padding:8px 0;border-radius:16px}
+#score{font-size:36px;font-weight:700;line-height:1.1}#best{font-size:14px;font-weight:600;color:#ffd84d}
+body.land #hud,body.land #nextBox{background:rgba(255,255,255,.07)}
+#nextBox{position:fixed;z-index:2;border-radius:16px;background:rgba(255,255,255,.07);cursor:pointer;text-align:center;font-size:12px;font-weight:600;padding-top:6px}
+body.land #nextBox{font-size:15px}
+#ladder{position:fixed;z-index:2;display:flex}#ladder button{flex:1;background:transparent;box-shadow:none;border-radius:50%;padding:0;cursor:pointer}
+#ladder button:hover{background:rgba(255,255,255,.1)}
+#danger{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0;background:radial-gradient(ellipse at center,rgba(255,40,40,0) 45%,rgba(255,40,40,.45) 100%)}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 104px);transform:translate(-50%,-10px);max-width:92vw;z-index:8;opacity:0;pointer-events:none;transition:.3s;background:#ffcc33;color:#211c55;font-size:16px;padding:10px 16px;border-radius:16px;box-shadow:0 8px 24px #0008;white-space:nowrap}
+#toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+body.land #toast{white-space:normal;text-align:center}#toast span{opacity:.75}
+#bInfo{position:fixed;top:calc(env(safe-area-inset-top) + 10px);left:154px;z-index:4}
+body:not(.land) #bInfo{left:auto;right:82px}
+#noGL{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:18px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:5}
 .modal.show{display:flex}
 .modal.show .card{animation:cardIn .4s cubic-bezier(.2,1.5,.4,1)}@keyframes cardIn{from{transform:scale(.6);opacity:0}}
@@ -26,7 +40,13 @@ button small{display:block;font-size:10px;opacity:.75}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+<div id="danger"></div>
+<div id="hud"><div id="score">0</div><div id="best"></div></div>
+<div id="nextBox" role="button"><span id="nextLbl"></span></div>
+<div id="ladder"></div>
+<button id="bInfo" class="ux-snd"></button>
+<button id="toast"></button>
+<div id="noGL">WebGL is required to play Merge Planets. Please update your browser or enable hardware acceleration.</div>
 <div class="modal" id="mOver"><div class="card">
   <h2 id="tOver"></h2>
   <div class="big" id="finalScore">0</div>
@@ -38,6 +58,10 @@ button small{display:block;font-size:10px;opacity:.75}
 <script src="trophies.js"></script>
 <script src="ads.js"></script>
 <script src="ux.js"></script>
+<script src="pixi.min.js"></script>
+<script src="sphere.js"></script>
+<script src="planets.js"></script>
+<script src="viewer.js"></script>
 <script src="game.js"></script>
 <script>if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js')</script>
 </body>
