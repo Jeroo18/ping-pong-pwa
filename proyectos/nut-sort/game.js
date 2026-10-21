@@ -18,9 +18,11 @@
     ]
   });
   document.querySelectorAll('[data-t]').forEach(el => { el.textContent = T[el.dataset.t]; });
+  document.querySelectorAll('[data-ic]').forEach(el => { el.outerHTML = UX.icon(el.dataset.ic); });
+  const coinTxt = t => String(t).replace(/🪙/g, UX.icon('coin'));
   UX.soundButton(document.getElementById('bSound'));
   document.getElementById('boltTxt').textContent = T.ad ? `${T.bolt} · ${T.ad}` : T.bolt;
-  document.getElementById('hintTxt').textContent = `${T.hint} · 50🪙`;
+  document.getElementById('hintTxt').innerHTML = `${T.hint} · 50 ${UX.icon('coin')}`;
 
   const COLORS = ['#ff4d4d', '#3d7bff', '#ffd23d', '#2ecc71', '#a55eea', '#ff9f1a', '#ff6bcb', '#22d3ee', '#8d5524', '#b8f400', '#f5f5f5', '#1e2a78'];
   const CAP = 4;
@@ -104,29 +106,46 @@
 
   // ---------- Interfaz ----------
   const $ = id => document.getElementById(id);
-  const board = $('board');
+  const board = $('board'), wrap = $('bolts');
+  let Z = 1, fresh = false, anim = null;
+  // Agranda los tornillos hasta llenar el espacio libre (en escritorio se ven grandes, en el móvil caben).
+  function fit() {
+    const n = bolts.length; if (!n) return;
+    const avW = board.clientWidth - 16, avH = board.clientHeight - 16, bw = 70, bh = CAP * 26 + 44, gy = 40;
+    let z = .5, per = n;
+    for (let t = 2; t >= .5; t -= .05) {
+      const fitPer = Math.max(1, Math.floor((avW / t + 8) / bw)), rows = Math.ceil(n / fitPer);
+      if ((rows * bh + (rows - 1) * gy + 36) * t <= avH) { z = t; per = Math.ceil(n / rows); break; }
+    }
+    Z = z; wrap.style.zoom = z; wrap.style.width = (per * bw) + 'px';
+  }
+  addEventListener('resize', () => { fit(); if (coach) coach.update(); });
   function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 1600); }
 
   function render() {
     $('lvl').textContent = T.level(S.level);
-    $('coins').textContent = `🪙 ${S.coins}`;
+    $('coins').innerHTML = `${UX.icon('coin')} ${S.coins}`;
     $('undoLeft').textContent = undosLeft > 0 ? `${undosLeft}` : T.ad;
     document.body.className = 'theme-' + S.theme;
-    board.innerHTML = '';
+    wrap.innerHTML = '';
     bolts.forEach((b, i) => {
       const el = document.createElement('div');
-      el.className = 'bolt' + (isDone(b) ? ' done' : '') + (i === selected ? ' sel' : '');
+      el.className = 'bolt' + (isDone(b) ? ' done' : '') + (i === selected ? ' sel' : '') + (fresh ? ' enter' : '');
+      if (fresh) el.style.animationDelay = (i * 45) + 'ms';
       el.style.height = (CAP * 26 + 44) + 'px';
-      const k = i === selected ? runLen(b) : 0;
+      const k = i === selected ? runLen(b) : (anim && anim.fall === i ? anim.k : 0);
       b.forEach((c, j) => {
         const n = document.createElement('div');
-        n.className = 'nut' + (j >= b.length - k ? ' up' : '');
-        n.style.background = COLORS[c];
+        const top = j >= b.length - k;
+        n.className = 'nut' + (top && i === selected ? ' up' : '') + (top && anim && anim.rise === i ? ' rise' : '') + (top && anim && anim.fall === i ? ' fall' : '');
+        n.style.backgroundColor = COLORS[c];
         el.appendChild(n);
       });
       el.addEventListener('click', () => tap(i));
-      board.appendChild(el);
+      wrap.appendChild(el);
     });
+    fresh = false; anim = null;
+    fit();
     if (coach) coach.update();
   }
 
@@ -134,47 +153,66 @@
   let coach = null, firstMove = null;
   const center = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * .45]; };
   function coachPath() {
-    if (!firstMove || !board.children.length) return null;
+    if (!firstMove || !wrap.children.length) return null;
     const [a, d] = firstMove;
-    const A = board.children[a], D = board.children[d];
+    const A = wrap.children[a], D = wrap.children[d];
     if (!A || !D) return null;
     return selected === a ? [center(D)] : [center(A), center(D)];
   }
 
-  function beep(f, d) {
-    if (UX.muted) return;
-    try {
-      const a = beep.ctx || (beep.ctx = new (window.AudioContext || window.webkitAudioContext)());
-      const o = a.createOscillator(), g = a.createGain();
-      o.frequency.value = f; g.gain.setValueAtTime(.08, a.currentTime); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + d);
-      o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + d);
-    } catch (e) {}
+  // Las tuercas vuelan en arco del tornillo de origen al de destino (solo es visual: el estado ya cambió).
+  function fly(from, to, rects, k, srcTop) {
+    const D = wrap.children[to]; if (!D) return;
+    const nuts = [...D.querySelectorAll('.nut')].slice(-k), dTop = D.getBoundingClientRect().top;
+    const lift = Math.min(srcTop, dTop) - 30 * Z;
+    nuts.forEach((n, j) => {
+      const r0 = rects[k - 1 - j], r1 = n.getBoundingClientRect();
+      if (!r0) return;
+      const dx = (r0.left - r1.left) / Z, dy = (r0.top - r1.top) / Z, ly = (lift - r1.top) / Z - j * 4;
+      n.classList.add('fly');
+      n.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: `translate(${dx}px,${ly}px)`, offset: .28 }, { transform: `translate(0,${ly}px)`, offset: .7 }, { transform: 'translate(0,0)' }],
+        { duration: 400, delay: j * 45, easing: 'cubic-bezier(.45,0,.35,1)', fill: 'backwards' });
+    });
+  }
+  function celebrate(i) {
+    const el = wrap.children[i]; if (!el) return;
+    el.classList.add('pulse');
+    const r = el.getBoundingClientRect();
+    UX.burst(r.left + r.width / 2, r.top + r.height * .35, { colors: [COLORS[bolts[i][0]], '#fff', '#ffe680'], n: 22, speed: 420, size: 8 * Z, shape: 'star', up: true, life: .9 });
+    UX.sfx('complete');
   }
 
   function tap(i) {
     if (busy) return;
     if (selected < 0) {
       if (!bolts[i].length || isDone(bolts[i])) return;
-      selected = i; beep(520, .06); render(); return;
+      selected = i; anim = { rise: i }; UX.sfx('pick'); render(); return;
     }
-    if (selected === i) { selected = -1; render(); return; }
+    if (selected === i) { anim = { fall: i, k: runLen(bolts[i]) }; selected = -1; UX.sfx('tap'); render(); return; }
     if (canMove(bolts, selected, i)) {
+      const from = selected, k = Math.min(runLen(bolts[from]), CAP - bolts[i].length);
+      const S0 = wrap.children[from], rects = S0 ? [...S0.querySelectorAll('.nut')].slice(-k).map(n => n.getBoundingClientRect()) : [];
+      const srcTop = S0 ? S0.getBoundingClientRect().top : 0;
       history.push(bolts.map(b => b.slice()));
-      applyMove(bolts, selected, i);
+      applyMove(bolts, from, i);
       selected = -1;
       if (coach && coach.active) { coach.hideHand(); firstMove = null; }
-      beep(isDone(bolts[i]) ? 880 : 660, .08);
-      if (isDone(bolts[i])) Ads.happytime();
+      const done = isDone(bolts[i]);
       render();
-      if (won(bolts)) setTimeout(win, 350);
+      fly(from, i, rects, k, srcTop);
+      setTimeout(() => { if (done) { celebrate(i); Ads.happytime(); } else UX.sfx('place'); }, 380 + k * 45);
+      if (won(bolts)) setTimeout(win, 420);
     } else if (bolts[i].length && !isDone(bolts[i])) {
-      selected = i; beep(520, .06); render();
-    } else { selected = -1; render(); }
+      const prev = selected;
+      selected = i; anim = { rise: i }; UX.sfx('pick'); render();
+      const el = wrap.children[prev]; if (el) UX.shake(el, 4);
+    } else { const el = wrap.children[i]; selected = -1; render(); UX.sfx('error'); if (wrap.children[i]) UX.shake(wrap.children[i], 5); }
   }
 
   function startLevel() {
     bolts = generate(S.level);
     history = []; selected = -1; undosLeft = FREE_UNDOS; extraUsed = false;
+    fresh = true;
     if (S.level === 1 && !coach) {
       const p = solve(bolts, 80000);
       firstMove = p && p[0];
@@ -191,7 +229,8 @@
     reward = 10 + Math.floor(S.level / 5) * 5;
     S.coins += reward; S.level++; persist();
     Trophies.set('levels', S.level - 1); Trophies.add('coins', reward);
-    $('winTxt').textContent = T.earned(reward);
+    $('winTxt').innerHTML = coinTxt(T.earned(reward));
+    UX.confetti(); UX.sfx('win');
     $('bDouble').disabled = false;
     $('mWin').classList.add('show');
     render();
@@ -204,17 +243,17 @@
   };
   $('bDouble').onclick = async () => {
     $('bDouble').disabled = true;
-    if (await Ads.rewarded()) { S.coins += reward; persist(); Trophies.add('coins', reward); $('winTxt').textContent = T.earned(reward * 2); render(); }
+    if (await Ads.rewarded()) { S.coins += reward; persist(); Trophies.add('coins', reward); $('winTxt').innerHTML = coinTxt(T.earned(reward * 2)); UX.sfx('coin'); render(); }
   };
   $('bUndo').onclick = async () => {
-    if (!history.length) return toast(T.noUndo);
+    if (!history.length) { UX.sfx('error'); return toast(T.noUndo); }
     if (undosLeft <= 0) { if (!(await Ads.rewarded())) return; undosLeft = FREE_UNDOS; }
-    bolts = history.pop(); undosLeft--; selected = -1; render();
+    bolts = history.pop(); undosLeft--; selected = -1; UX.sfx('drop'); render();
   };
   $('bBolt').onclick = async () => {
     if (extraUsed) return toast(T.oneBolt);
     if (!(await Ads.rewarded())) return;
-    extraUsed = true; bolts.push([]); toast(T.boltAdded); render();
+    extraUsed = true; bolts.push([]); toast(T.boltAdded); UX.sfx('complete'); render();
   };
   $('bHint').onclick = () => {
     if (S.coins < 50) return toast(T.noCoins);
@@ -222,8 +261,8 @@
     if (!p || !p.length) return toast(T.stuck);
     S.coins -= 50; persist();
     const [a, d] = p[0];
-    selected = a; render();
-    const el = board.children[d];
+    selected = a; anim = { rise: a }; UX.sfx('coin'); render();
+    const el = wrap.children[d];
     if (el) { el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 500, iterations: 2 }); }
   };
   $('bRestart').onclick = () => { if (history.length) { bolts = history[0]; history = []; selected = -1; render(); } };
@@ -235,7 +274,7 @@
       const b = document.createElement('button');
       const owned = S.owned.includes(i);
       b.className = i === S.theme ? '' : 'ghost';
-      b.innerHTML = `${T.themes[i]}<small>${owned ? T.owned : T.buy(p)}</small>`;
+      b.innerHTML = `${T.themes[i]}<small>${owned ? T.owned : coinTxt(T.buy(p))}</small>`;
       b.onclick = () => {
         if (!owned) { if (S.coins < p) return toast(T.noCoins); S.coins -= p; S.owned.push(i); }
         S.theme = i; persist(); render(); renderShop();

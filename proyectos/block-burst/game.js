@@ -35,9 +35,10 @@
 
   const cv = document.getElementById('c'), ctx = cv.getContext('2d');
   let W, H, dpr, cell, gx, gy, trayY, trayCell, land, trayX, trayW;
-  const HEAD = 80; // en horizontal: espacio para el marcador encima de la bandeja
+  const HEAD = 96; // en horizontal: espacio para el marcador encima de la bandeja
+  const TOP = 58;  // franja de arriba para los botones de idioma, trofeos y sonido
   let grid, tray, score, best = +localStorage.getItem('blockburst_best') || 0, combo, sinceClear, revived, over;
-  let drag = null, fx = [], parts = [];
+  let drag = null, ret = null, popT, clearing = [], shown = 0, overT = -1, trayIn = 0;
 
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -45,14 +46,14 @@
     cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     land = W > H * 1.25; // pantalla horizontal (escritorio): tablero a la izquierda, piezas a la derecha
     if (land) {
-      cell = Math.floor(Math.min((H - 40) / N, (W * 0.55) / N, 64));
-      trayW = Math.floor(cell * N * 0.42);
-      gx = Math.round((W - (cell * N + 30 + trayW)) / 2); gy = Math.round((H - cell * N) / 2);
-      trayX = gx + cell * N + 30; trayY = gy + HEAD;
+      cell = Math.floor(Math.min((H - TOP - 16) / N, (W * 0.55) / N, 72));
+      trayW = Math.floor(Math.max(cell * N * 0.45, 150));
+      gx = Math.round((W - (cell * N + 40 + trayW)) / 2); gy = Math.round(TOP + (H - TOP - 16 - cell * N) / 2);
+      trayX = gx + cell * N + 40; trayY = gy + HEAD;
       trayCell = Math.floor(Math.min(cell * 0.55, (cell * N - HEAD) / 3 / 5.2, trayW / 5.4));
     } else {
       cell = Math.floor(Math.min((W - 24) / N, (H * 0.56) / N, 60));
-      gx = Math.round((W - cell * N) / 2); gy = Math.round(Math.max(90, H * 0.14));
+      gx = Math.round((W - cell * N) / 2); gy = Math.round(Math.max(100, H * 0.15));
       trayY = gy + cell * N + Math.max(30, H * 0.04);
       trayCell = Math.floor(cell * 0.55);
     }
@@ -65,11 +66,13 @@
 
   function refill() {
     for (let i = 0; i < 25; i++) { tray = [newPiece(), newPiece(), newPiece()]; if (tray.some(fitsAnywhere)) break; }
+    trayIn = 0; // las piezas nuevas entran con un pequeño rebote
   }
 
   function reset() {
     grid = Array.from({ length: N }, () => Array(N).fill(-1));
-    score = 0; combo = 0; sinceClear = 0; revived = false; over = false; fx = []; parts = [];
+    score = 0; shown = 0; combo = 0; sinceClear = 0; revived = false; over = false; overT = -1; clearing = []; ret = null;
+    popT = Array.from({ length: N }, () => Array(N).fill(0));
     refill();
     document.getElementById('mOver').classList.remove('show');
     Ads.gameplayStart();
@@ -86,7 +89,7 @@
   function place(idx, r, c) {
     const p = tray[idx];
     const { rows, cols } = linesFor(p, r, c);
-    p.cells.forEach(([dr, dc]) => { grid[r + dr][c + dc] = p.color; });
+    p.cells.forEach(([dr, dc]) => { grid[r + dr][c + dc] = p.color; popT[r + dr][c + dc] = .2; });
     score += p.cells.length;
     tray[idx] = null;
     if (coach && coach.active) coach.done();
@@ -94,39 +97,38 @@
     if (L) {
       combo++; sinceClear = 0;
       Trophies.add('lines', L); Trophies.set('combo', combo);
-      rows.forEach(i => { for (let j = 0; j < N; j++) burst(i, j, grid[i][j]); });
-      cols.forEach(j => { for (let i = 0; i < N; i++) burst(i, j, grid[i][j]); });
+      // Las celdas de las líneas se encogen en ola desde donde cayó la pieza, con chispas de su color.
+      const cr = r + p.h / 2, cc = c + p.w / 2, seen = new Set();
+      const kill = (i, j) => {
+        const k = i * N + j; if (seen.has(k)) return; seen.add(k);
+        const delay = Math.hypot(i - cr, j - cc) * .028;
+        clearing.push({ r: i, c: j, color: grid[i][j], t: -delay });
+        setTimeout(() => UX.burst(gx + (j + .5) * cell, gy + (i + .5) * cell, { colors: [COLORS[grid[i][j]] || '#fff', '#fff'], n: 5, speed: 260, size: cell * .22, life: .6 }), delay * 1000);
+      };
+      rows.forEach(i => { for (let j = 0; j < N; j++) kill(i, j); });
+      cols.forEach(j => { for (let i = 0; i < N; i++) kill(i, j); });
       rows.forEach(i => { for (let j = 0; j < N; j++) grid[i][j] = -1; });
       cols.forEach(j => { for (let i = 0; i < N; i++) grid[i][j] = -1; });
       const pts = 10 * L * L + (combo > 1 ? 10 * combo : 0);
       score += pts;
-      if (grid.every(row => row.every(v => v < 0))) score += 300; // tablero limpio
-      fx.push({ text: `+${pts}`, sub: combo > 1 ? `${T.combo} x${combo}` : T.great[Math.min(L - 1, 3)], x: gx + (c + p.w / 2) * cell, y: gy + (r + p.h / 2) * cell, t: 0 });
-      tone(440 + 110 * Math.min(combo, 6), .15); Ads.happytime();
+      const px = gx + cc * cell, py = gy + cr * cell;
+      UX.pop(`+${pts}`, px, py, { size: Math.round(cell * .62), sub: combo > 1 ? `${T.combo} x${combo}` : T.great[Math.min(L - 1, 3)] });
+      if (grid.every(row => row.every(v => v < 0))) { // tablero limpio
+        score += 300;
+        setTimeout(() => { UX.pop('+300', gx + cell * N / 2, gy + cell * N / 2, { size: Math.round(cell * .9), color: '#ffe14d', sub: '★ ★ ★', dur: 1.6 }); UX.confetti(); }, 250);
+      }
+      UX.shake(cv, Math.min(3 + L * 3 + combo, 16));
+      UX.sfx('clear', Math.min(combo + L - 1, 5)); Ads.happytime();
     } else {
       if (++sinceClear >= 3) combo = 0;
-      tone(300, .05);
+      UX.sfx('place');
     }
     if (tray.every(x => !x)) refill();
     if (!tray.some(x => x && fitsAnywhere(x))) gameOver();
   }
 
-  function burst(i, j, color) {
-    for (let k = 0; k < 4; k++) parts.push({ x: gx + (j + .5) * cell, y: gy + (i + .5) * cell, vx: (Math.random() - .5) * 6, vy: -Math.random() * 6, life: 1, color: COLORS[color] || '#fff' });
-  }
-
-  function tone(f, d) {
-    if (UX.muted) return;
-    try {
-      const a = tone.ctx || (tone.ctx = new (window.AudioContext || window.webkitAudioContext)());
-      const o = a.createOscillator(), g = a.createGain(); o.type = 'triangle';
-      o.frequency.value = f; g.gain.setValueAtTime(.07, a.currentTime); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + d);
-      o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + d);
-    } catch (e) {}
-  }
-
   async function gameOver() {
-    over = true; Ads.gameplayStop();
+    over = true; overT = 0; Ads.gameplayStop(); UX.sfx('over');
     Trophies.set('score', score); Trophies.add('plays');
     const isBest = score > best;
     if (isBest) { best = score; localStorage.setItem('blockburst_best', best); }
@@ -137,12 +139,12 @@
     rv.style.display = revived ? 'none' : '';
     rv.innerHTML = `${T.revive}<small>${T.ad}</small>`;
     document.getElementById('bAgain').textContent = T.again;
-    setTimeout(() => document.getElementById('mOver').classList.add('show'), 500);
+    setTimeout(() => document.getElementById('mOver').classList.add('show'), 1100);
   }
 
   document.getElementById('bRevive').onclick = async () => {
     if (!(await Ads.rewarded())) return;
-    revived = true; over = false;
+    revived = true; over = false; overT = -1;
     for (let r = 2; r < 6; r++) for (let c = 0; c < N; c++) grid[r][c] = -1; // libera el centro
     tray = [{ cells: [[0, 0]], color: 4, w: 1, h: 1 }, newPiece(), { cells: [[0, 0], [0, 1]], color: 2, w: 2, h: 1 }];
     document.getElementById('mOver').classList.remove('show');
@@ -174,7 +176,8 @@
     else { if (e.clientY < trayY - 10) return; i = Math.floor(e.clientX / (W / 3)); }
     i = Math.max(0, Math.min(2, i));
     if (!tray[i]) return;
-    drag = { idx: i, x: e.clientX, y: e.clientY, mouse: e.pointerType === 'mouse' };
+    drag = { idx: i, x: e.clientX, y: e.clientY, mouse: e.pointerType === 'mouse', s: trayCell / cell };
+    ret = null; UX.sfx('pick');
     if (coach) coach.hideHand();
     cv.setPointerCapture(e.pointerId);
   });
@@ -182,65 +185,98 @@
   cv.addEventListener('pointerup', () => {
     if (!drag) return;
     const { r, c } = dropTarget(drag.x, drag.y);
-    const idx = drag.idx; drag = null;
+    const idx = drag.idx, d = drag; drag = null;
     if (fits(tray[idx], r, c)) place(idx, r, c);
+    else { // vuelve a su sitio en la bandeja
+      const p = tray[idx], o = dropTarget(d.x, d.y);
+      ret = { idx, x: o.ox + p.w * cell / 2, y: o.oy + p.h * cell / 2, t: 0 };
+      if (o.oy + p.h * cell > gy && o.oy < gy + cell * N) UX.sfx('error');
+    }
   });
   cv.addEventListener('pointercancel', () => { drag = null; });
 
   // ---------- Dibujo ----------
-  function block(x, y, s, color, alpha) {
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = v => Math.max(0, Math.min(255, Math.round(k > 0 ? v + (255 - v) * k : v * (1 + k)))); return `rgb(${f(n >> 16)},${f(n >> 8 & 255)},${f(n & 255)})`; };
+  const PAL = COLORS.map(c => [shade(c, .35), c, shade(c, -.3), shade(c, -.5)]);
+  const GRAY = ['#8a93b8', '#6b7499', '#4d5577', '#3a4160'];
+  function block(x, y, s, color, alpha, scale, flash) {
+    const P = color === 'gray' ? GRAY : PAL[color];
     ctx.globalAlpha = alpha == null ? 1 : alpha;
-    const r = s * .18;
-    ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x + 1, y + 1, s - 2, s - 2, r); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,.28)'; ctx.beginPath(); ctx.roundRect(x + 3, y + 3, s - 6, s * .3, r * .7); ctx.fill();
-    ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.fillRect(x + 3, y + s * .78, s - 6, s * .16);
+    if (scale != null && scale !== 1) { const d = s * (1 - scale) / 2; x += d; y += d; s *= scale; }
+    if (s < 1) { ctx.globalAlpha = 1; return; }
+    const r = s * .2, g = ctx.createLinearGradient(0, y, 0, y + s);
+    g.addColorStop(0, P[0]); g.addColorStop(.5, P[1]); g.addColorStop(1, P[2]);
+    ctx.fillStyle = P[3]; ctx.beginPath(); ctx.roundRect(x + 1, y + 2, s - 2, s - 2, r); ctx.fill();          // borde inferior
+    ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(x + 1, y + 1, s - 2, s - 4, r); ctx.fill();               // cara
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.beginPath(); ctx.roundRect(x + s * .16, y + s * .1, s * .68, s * .16, s * .08); ctx.fill(); // brillo
+    if (flash) { ctx.globalAlpha = (alpha == null ? 1 : alpha) * flash; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.roundRect(x + 1, y + 1, s - 2, s - 2, r); ctx.fill(); }
     ctx.globalAlpha = 1;
   }
+  const easeBack = t => { const c = 1.7; t -= 1; return 1 + (c + 1) * t * t * t + c * t * t; };
 
-  function draw() {
+  let lastT = performance.now();
+  function draw(now) {
+    const dt = Math.min(((now || performance.now()) - lastT) / 1000, .05); lastT = now || performance.now();
     ctx.clearRect(0, 0, W, H);
-    // Marcador
-    ctx.textAlign = 'center'; ctx.fillStyle = '#fff';
-    const sx = land ? trayX + trayW / 2 : W / 2, sy = land ? gy + 56 : gy - 18;
-    ctx.font = '700 14px system-ui'; ctx.globalAlpha = .7; ctx.fillText(`${T.best} ${best}`, sx, sy - 40); ctx.globalAlpha = 1;
-    ctx.font = '800 38px system-ui'; ctx.fillText(score, sx, sy);
+    // Brillo detrás del tablero
+    const bg = ctx.createRadialGradient(gx + cell * N / 2, gy + cell * N / 2, cell, gx + cell * N / 2, gy + cell * N / 2, cell * N);
+    bg.addColorStop(0, 'rgba(110,140,255,.22)'); bg.addColorStop(1, 'rgba(110,140,255,0)');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    // Marcador (sube contando)
+    shown += (score - shown) * Math.min(1, dt * 10); if (Math.abs(score - shown) < .5) shown = score;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#fff';
+    const sx = land ? trayX + trayW / 2 : W / 2, sy = land ? gy + 62 : gy - 22;
+    if (land) { ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.beginPath(); ctx.roundRect(trayX, gy, trayW, 82, 16); ctx.fill(); ctx.fillStyle = '#fff'; }
+    ctx.font = `600 14px ${UX.FONT}`; ctx.fillStyle = '#ffd84d'; ctx.fillText(`★ ${T.best} ${Math.max(best, score)}`, sx, land ? gy + 24 : sy - 40);
+    ctx.fillStyle = '#fff'; ctx.font = `700 ${land ? 40 : 40}px ${UX.FONT}`; ctx.fillText(Math.round(shown), sx, sy);
     // Tablero
-    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.roundRect(gx - 6, gy - 6, cell * N + 12, cell * N + 12, 12); ctx.fill();
+    ctx.fillStyle = 'rgba(8,12,40,.55)'; ctx.beginPath(); ctx.roundRect(gx - 8, gy - 8, cell * N + 16, cell * N + 16, 16); ctx.fill();
+    ctx.strokeStyle = 'rgba(140,160,255,.25)'; ctx.lineWidth = 2; ctx.stroke();
+    const grayRows = overT >= 0 ? Math.floor((overT += dt) / .07) : -1;
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
-      if (grid[r][c] >= 0) block(gx + c * cell, gy + r * cell, cell, COLORS[grid[r][c]]);
-      else { ctx.fillStyle = 'rgba(255,255,255,.06)'; ctx.beginPath(); ctx.roundRect(gx + c * cell + 1, gy + r * cell + 1, cell - 2, cell - 2, 4); ctx.fill(); }
+      const x = gx + c * cell, y = gy + r * cell;
+      ctx.fillStyle = 'rgba(255,255,255,.055)'; ctx.beginPath(); ctx.roundRect(x + 2, y + 2, cell - 4, cell - 4, cell * .16); ctx.fill();
+      if (grid[r][c] >= 0) {
+        let sc = 1;
+        if (popT[r][c] > 0) { popT[r][c] = Math.max(0, popT[r][c] - dt); sc = .7 + .3 * easeBack(1 - popT[r][c] / .2); }
+        block(x, y, cell, grayRows > N - 1 - r ? 'gray' : grid[r][c], 1, sc);
+      }
     }
+    // Líneas que se limpian: destello blanco y se encogen
+    clearing = clearing.filter(q => (q.t += dt) < .32);
+    clearing.forEach(q => { if (q.t < 0) return block(gx + q.c * cell, gy + q.r * cell, cell, q.color, 1, 1, .6); const k = q.t / .32; block(gx + q.c * cell, gy + q.r * cell, cell, q.color, 1 - k * .5, 1 - k, .8 * (1 - k)); });
     // Vista previa al arrastrar
     if (drag && tray[drag.idx]) {
       const p = tray[drag.idx];
+      drag.s += (1 - drag.s) * Math.min(1, dt * 18);
       const { r, c, ox, oy } = dropTarget(drag.x, drag.y);
       if (fits(p, r, c)) {
         const { rows, cols } = linesFor(p, r, c);
-        ctx.fillStyle = 'rgba(255,255,255,.18)';
-        rows.forEach(i => ctx.fillRect(gx, gy + i * cell, cell * N, cell));
-        cols.forEach(j => ctx.fillRect(gx + j * cell, gy, cell, cell * N));
-        p.cells.forEach(([dr, dc]) => block(gx + (c + dc) * cell, gy + (r + dr) * cell, cell, COLORS[p.color], .4));
+        const pulse = .55 + .25 * Math.sin(lastT / 110);
+        rows.forEach(i => { for (let j = 0; j < N; j++) if (grid[i][j] >= 0) block(gx + j * cell, gy + i * cell, cell, p.color, 1, 1, pulse * .5); });
+        cols.forEach(j => { for (let i = 0; i < N; i++) if (grid[i][j] >= 0) block(gx + j * cell, gy + i * cell, cell, p.color, 1, 1, pulse * .5); });
+        p.cells.forEach(([dr, dc]) => block(gx + (c + dc) * cell, gy + (r + dr) * cell, cell, p.color, .35));
       }
-      p.cells.forEach(([dr, dc]) => block(ox + dc * cell, oy + dr * cell, cell, COLORS[p.color]));
+      const cx = ox + p.w * cell / 2, cy = oy + p.h * cell / 2, s2 = cell * drag.s;
+      ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 10;
+      p.cells.forEach(([dr, dc]) => block(cx + (dc - p.w / 2) * s2, cy + (dr - p.h / 2) * s2, s2, p.color));
+      ctx.restore();
     }
     // Bandeja
+    trayIn = Math.min(1, trayIn + dt / .35);
     tray.forEach((p, i) => {
       if (!p || (drag && drag.idx === i)) return;
-      const ok = fitsAnywhere(p);
-      const x0 = slotX(i) - p.w * trayCell / 2, y0 = slotY(i) - p.h * trayCell / 2;
-      p.cells.forEach(([dr, dc]) => block(x0 + dc * trayCell, y0 + dr * trayCell, trayCell, COLORS[p.color], ok ? 1 : .3));
+      const ok = fitsAnywhere(p) && overT < 0;
+      let cx = slotX(i), cy = slotY(i), s2 = trayCell;
+      const k = Math.max(0, Math.min(1, trayIn * 1.6 - i * .3)); s2 *= easeBack(k);
+      if (ret && ret.idx === i) { // vuelve volando
+        ret.t += dt; const q = Math.min(1, ret.t / .22), e = 1 - (1 - q) * (1 - q);
+        cx = ret.x + (cx - ret.x) * e; cy = ret.y + (cy - ret.y) * e; s2 = cell + (trayCell - cell) * e;
+        if (q >= 1) ret = null;
+      }
+      if (s2 < 1) return;
+      p.cells.forEach(([dr, dc]) => block(cx + (dc - p.w / 2) * s2, cy + (dr - p.h / 2) * s2, s2, ok ? p.color : 'gray', ok ? 1 : .55));
     });
-    // Partículas y textos
-    parts = parts.filter(p => (p.life -= .03) > 0);
-    parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .3; ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x - 4, p.y - 4, 8, 8); });
-    ctx.globalAlpha = 1;
-    fx = fx.filter(f => (f.t += 1 / 60) < 1.2);
-    fx.forEach(f => {
-      ctx.globalAlpha = Math.max(0, 1 - f.t / 1.2);
-      ctx.fillStyle = '#fff'; ctx.font = '800 30px system-ui'; ctx.fillText(f.text, f.x, f.y - f.t * 50);
-      ctx.fillStyle = '#ffe14d'; ctx.font = '800 20px system-ui'; ctx.fillText(f.sub, f.x, f.y - f.t * 50 + 26);
-    });
-    ctx.globalAlpha = 1;
     requestAnimationFrame(draw);
   }
 
@@ -260,5 +296,5 @@
     slot: i => [slotX(i), slotY(i)], dropPoint };
   resize(); reset();
   coach = UX.coach('block-burst', { tip: T.tutorial, path: coachPath, tipY: () => land ? 14 : Math.min(H - 50, trayY + trayCell * 5 + 12) });
-  draw();
+  requestAnimationFrame(draw);
 })();

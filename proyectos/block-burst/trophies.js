@@ -308,6 +308,7 @@
     o.querySelector('#tzDl').onclick = () => { const a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = `${cfg.game}-trophy.png`; a.click(); };
   }
 
+  const TROPHY_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle" aria-hidden="true"><path d="M7 3h10v5a5 5 0 0 1-10 0z" fill="currentColor"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="11" y="12" width="2" height="5" fill="currentColor"/><rect x="7.5" y="17" width="9" height="3" rx="1" fill="currentColor"/></svg>';
   function init(c) {
     cfg = c; data = read(KEY(), { stats: {}, got: {}, days: [] });
     data.days = data.days || [];
@@ -316,8 +317,8 @@
     data.stats.days = data.days.length;
     write(KEY(), data);
     css();
-    if (c.button) { c.button.textContent = '🏆'; c.button.addEventListener('click', e => { e.stopPropagation(); open(); }); }
-    else if (c.floating) { const b = document.createElement('button'); b.className = 'tz-fab'; document.body.appendChild(b); c.button = b; b.textContent = '🏆'; b.addEventListener('click', e => { e.stopPropagation(); open(); }); }
+    if (c.button) { c.button.innerHTML = TROPHY_SVG; c.button.addEventListener('click', e => { e.stopPropagation(); open(); }); }
+    else if (c.floating) { const b = document.createElement('button'); b.className = 'tz-fab'; document.body.appendChild(b); c.button = b; b.innerHTML = TROPHY_SVG; b.addEventListener('click', e => { e.stopPropagation(); open(); }); }
     setTimeout(check, 600);
   }
 

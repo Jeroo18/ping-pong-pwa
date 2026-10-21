@@ -10,10 +10,13 @@
 <link rel="icon" href="icon.svg">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{margin:0;height:100%;background:radial-gradient(ellipse at top,#26205e,#0a0a24 70%);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:none}
+html,body{margin:0;height:100%;background:radial-gradient(ellipse at top,#26205e,#0a0a24 70%);color:#fff;font-family:Fredoka,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:none}
 canvas{display:block;width:100vw;height:100vh;height:100dvh}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:5}
 .modal.show{display:flex}
+.modal.show .card{animation:cardIn .4s cubic-bezier(.2,1.5,.4,1)}@keyframes cardIn{from{transform:scale(.6);opacity:0}}
+#bAgain{font-size:20px;padding:12px 26px}
+button:active{transform:translateY(2px)}
 .card{background:#211c55;border-radius:20px;padding:24px;text-align:center;min-width:260px;box-shadow:0 10px 40px #0008}
 .card h2{margin:0 0 8px}.big{font-size:42px;font-weight:800;margin:6px 0}
 .row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}

@@ -49,7 +49,7 @@
   }
 
   function button(el) {
-    el.textContent = '🌐';
+    el.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M3.5 12h17M12 3.5c-3 3.2-3 13.8 0 17M12 3.5c3 3.2 3 13.8 0 17" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>';
     el.setAttribute('aria-label', TITLE[lang]);
     el.title = TITLE[lang];
     el.addEventListener('click', e => { e.stopPropagation(); open(); });

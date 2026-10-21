@@ -11,7 +11,7 @@
 <style>
 :root{--bg1:#1b1440;--bg2:#3a1f6e;--panel:rgba(255,255,255,.08);--txt:#fff;--accent:#ffcc33}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{margin:0;height:100%;touch-action:manipulation;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--txt);background:linear-gradient(160deg,var(--bg1),var(--bg2));overflow:hidden}
+html,body{margin:0;height:100%;touch-action:manipulation;font-family:Fredoka,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--txt);background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.10),transparent 60%),linear-gradient(160deg,var(--bg1),var(--bg2));overflow:hidden}
 body.theme-1{--bg1:#0f3b2e;--bg2:#1f6e4f}
 body.theme-2{--bg1:#3b1f0f;--bg2:#8a4a1a}
 body.theme-3{--bg1:#0b1f3b;--bg2:#1a4f8a}
@@ -21,21 +21,34 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 h1{font-size:18px;margin:0}
 .hr{display:flex;gap:6px;align-items:center}
 button.lang{color:#fff;box-shadow:none;padding:6px 10px;font-size:16px;line-height:1}
-#board{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:14px 6px;padding:8px}
-.bolt{position:relative;width:62px;display:flex;flex-direction:column-reverse;align-items:center;padding-bottom:10px;cursor:pointer;transition:transform .15s}
-.bolt::before{content:"";position:absolute;bottom:10px;width:10px;top:-6px;border-radius:5px;background:linear-gradient(90deg,#9aa,#eef,#9aa);z-index:0}
-.bolt::after{content:"";position:absolute;bottom:0;width:62px;height:12px;border-radius:6px;background:linear-gradient(#ccd,#778)}
-.bolt.done::before{background:linear-gradient(90deg,#d9a400,#ffe680,#d9a400)}
-.bolt.sel{transform:translateY(-4px)}
-.nut{position:relative;z-index:1;width:56px;height:24px;margin-top:2px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%);box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),inset 0 4px 0 rgba(255,255,255,.35);transition:transform .18s}
+#board{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
+#bolts{display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:40px 8px;padding-top:36px}
+.bolt{position:relative;width:62px;display:flex;flex-direction:column-reverse;align-items:center;padding-bottom:10px;cursor:pointer}
+.bolt::before{content:"";position:absolute;bottom:10px;width:12px;top:-8px;border-radius:6px 6px 3px 3px;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 2px,transparent 2px 6px),linear-gradient(90deg,#8f9bb0,#f4f6ff 50%,#8f9bb0);z-index:0;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.bolt::after{content:"";position:absolute;bottom:0;width:62px;height:13px;border-radius:7px;background:linear-gradient(#e6e9f5,#8d93a8);box-shadow:0 4px 8px rgba(0,0,0,.35);transition:box-shadow .2s}
+.bolt.sel::after{box-shadow:0 0 0 2px #ffd84d,0 0 16px #ffd84d}
+.bolt.done::before{background:repeating-linear-gradient(0deg,rgba(120,70,0,.25) 0 2px,transparent 2px 6px),linear-gradient(90deg,#d9a400,#fff0a0 50%,#d9a400)}
+.bolt.done::after{background:linear-gradient(#ffe680,#c98a00);box-shadow:0 0 18px rgba(255,210,60,.7)}
+.bolt.enter{animation:boltIn .45s cubic-bezier(.2,1.5,.4,1) backwards}
+@keyframes boltIn{from{transform:translateY(30px) scale(.6);opacity:0}}
+.nut{position:relative;z-index:1;width:56px;height:24px;margin-top:2px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%);background-image:linear-gradient(180deg,rgba(255,255,255,.5) 0,rgba(255,255,255,.12) 30%,rgba(255,255,255,0) 50%,rgba(0,0,0,.12) 70%,rgba(0,0,0,.32) 100%);box-shadow:inset 0 -5px 0 rgba(0,0,0,.18)}
+.nut::after{content:"";position:absolute;left:30%;right:30%;top:42%;height:3px;border-radius:2px;background:rgba(0,0,0,.2)}
 .nut.up{transform:translateY(-34px)}
+.nut.rise{animation:rise .16s ease-out}@keyframes rise{from{transform:translateY(0)}}
+.nut.fall{animation:fall .18s cubic-bezier(.5,0,.6,1.4)}@keyframes fall{from{transform:translateY(-34px)}}
+.nut.fly{z-index:5}
+.bolt.pulse{animation:pulse .4s ease-out}@keyframes pulse{40%{transform:scale(1.08)}}
 .slot{height:24px;margin-top:2px;width:56px}
-footer{display:flex;gap:6px;justify-content:center;padding:10px 0 14px}
-footer button{min-width:60px;padding:8px 8px}
+footer{display:flex;gap:8px;justify-content:center;padding:8px 0 12px}
+footer button{min-width:68px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px}
+footer button .ux-ico{width:24px;height:24px}
+footer button small{font-size:11px;opacity:.9}
+#coins .ux-ico,.card .ux-ico{width:1.1em;height:1.1em}
 button{font:inherit;border:0;border-radius:14px;padding:10px 14px;font-weight:700;color:#1b1440;background:var(--accent);box-shadow:0 4px 0 rgba(0,0,0,.25);cursor:pointer}
 button.ghost{background:var(--panel);color:#fff}
 button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
 button small{display:block;font-size:10px;opacity:.75}
+#bNext{font-size:20px;padding:12px 28px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
 .modal.show{display:flex}
 .card{background:#2a1d5c;border-radius:20px;padding:22px;min-width:260px;max-width:90vw;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5)}
@@ -44,8 +57,9 @@ button small{display:block;font-size:10px;opacity:.75}
 .themes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
 .themes button{height:60px}
 /* Pantallas grandes (escritorio): tornillos más grandes para aprovechar el espacio */
-@media (min-width:900px) and (min-height:600px){#board{zoom:1.3}}
-@media (min-width:1200px) and (min-height:800px){#board{zoom:1.6}}
+.modal.show .card{animation:cardIn .4s cubic-bezier(.2,1.5,.4,1)}@keyframes cardIn{from{transform:scale(.6);opacity:0}}
+.winIco{width:76px;height:76px;margin:4px auto 2px;animation:spin 1.6s ease-in-out infinite}.winIco .ux-ico{width:76px;height:76px}
+@keyframes spin{50%{transform:rotateY(180deg) scale(1.08)}}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
 </style>
@@ -55,23 +69,24 @@ button small{display:block;font-size:10px;opacity:.75}
   <header>
     <span class="pill" id="lvl"></span>
     <h1>Nut Sort</h1>
-    <span class="hr"><button class="pill lang" id="bSound"></button><button class="pill lang" id="bTrophy"></button><button class="pill lang" id="bLang"></button><span class="pill" id="coins">🪙 0</span></span>
+    <span class="hr"><button class="pill lang" id="bSound"></button><button class="pill lang" id="bTrophy"></button><button class="pill lang" id="bLang"></button><span class="pill" id="coins">0</span></span>
   </header>
-  <div id="board" aria-label="tablero"></div>
+  <div id="board" aria-label="tablero"><div id="bolts"></div></div>
   <footer>
-    <button class="ghost" id="bUndo">↶ <span data-t="undo"></span><small id="undoLeft"></small></button>
-    <button class="ghost" id="bBolt">+🔩<small id="boltTxt"></small></button>
-    <button class="ghost" id="bHint">💡<small id="hintTxt"></small></button>
-    <button class="ghost" id="bRestart">⟳<small data-t="restart"></small></button>
-    <button class="ghost" id="bShop">🎨<small data-t="shop"></small></button>
+    <button class="ghost" id="bUndo"><i data-ic="undo"></i><small><span data-t="undo"></span> · <span id="undoLeft"></span></small></button>
+    <button class="ghost" id="bBolt"><i data-ic="bolt"></i><small id="boltTxt"></small></button>
+    <button class="ghost" id="bHint"><i data-ic="hint"></i><small id="hintTxt"></small></button>
+    <button class="ghost" id="bRestart"><i data-ic="restart"></i><small data-t="restart"></small></button>
+    <button class="ghost" id="bShop"><i data-ic="palette"></i><small data-t="shop"></small></button>
   </footer>
 </div>
 <div class="modal" id="mWin"><div class="card">
+  <div class="winIco"><i data-ic="coin"></i></div>
   <h2 data-t="win"></h2>
   <p id="winTxt"></p>
   <div class="row">
     <button id="bNext" data-t="next"></button>
-    <button class="ghost" id="bDouble">x2 🪙 <small data-t="ad"></small></button>
+    <button class="ghost" id="bDouble">x2 <i data-ic="coin"></i> <small data-t="ad"></small></button>
   </div>
 </div></div>
 <div class="modal" id="mShop"><div class="card">
