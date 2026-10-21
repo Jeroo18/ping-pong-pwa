@@ -18,6 +18,9 @@
     ]
   });
   document.querySelectorAll('[data-t]').forEach(el => { el.textContent = T[el.dataset.t]; });
+  UX.soundButton(document.getElementById('bSound'));
+  document.getElementById('boltTxt').textContent = T.ad ? `${T.bolt} · ${T.ad}` : T.bolt;
+  document.getElementById('hintTxt').textContent = `${T.hint} · 50🪙`;
 
   const COLORS = ['#ff4d4d', '#3d7bff', '#ffd23d', '#2ecc71', '#a55eea', '#ff9f1a', '#ff6bcb', '#22d3ee', '#8d5524', '#b8f400', '#f5f5f5', '#1e2a78'];
   const CAP = 4;
@@ -124,9 +127,22 @@
       el.addEventListener('click', () => tap(i));
       board.appendChild(el);
     });
+    if (coach) coach.update();
+  }
+
+  // Tutorial del nivel 1: la mano señala el primer movimiento (toca un tornillo y luego el destino).
+  let coach = null, firstMove = null;
+  const center = el => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * .45]; };
+  function coachPath() {
+    if (!firstMove || !board.children.length) return null;
+    const [a, d] = firstMove;
+    const A = board.children[a], D = board.children[d];
+    if (!A || !D) return null;
+    return selected === a ? [center(D)] : [center(A), center(D)];
   }
 
   function beep(f, d) {
+    if (UX.muted) return;
     try {
       const a = beep.ctx || (beep.ctx = new (window.AudioContext || window.webkitAudioContext)());
       const o = a.createOscillator(), g = a.createGain();
@@ -146,6 +162,7 @@
       history.push(bolts.map(b => b.slice()));
       applyMove(bolts, selected, i);
       selected = -1;
+      if (coach && coach.active) { coach.hideHand(); firstMove = null; }
       beep(isDone(bolts[i]) ? 880 : 660, .08);
       if (isDone(bolts[i])) Ads.happytime();
       render();
@@ -158,6 +175,11 @@
   function startLevel() {
     bolts = generate(S.level);
     history = []; selected = -1; undosLeft = FREE_UNDOS; extraUsed = false;
+    if (S.level === 1 && !coach) {
+      const p = solve(bolts, 80000);
+      firstMove = p && p[0];
+      coach = UX.coach('nut-sort', { tip: T.tutorial, taps: true, path: coachPath, tipY: () => document.querySelector('header').getBoundingClientRect().bottom + 6 });
+    } else if (coach && coach.active) coach.done();
     render();
     Ads.gameplayStart();
   }
@@ -165,6 +187,7 @@
   let reward = 0;
   function win() {
     Ads.gameplayStop();
+    if (coach && coach.active) coach.done();
     reward = 10 + Math.floor(S.level / 5) * 5;
     S.coins += reward; S.level++; persist();
     Trophies.set('levels', S.level - 1); Trophies.add('coins', reward);

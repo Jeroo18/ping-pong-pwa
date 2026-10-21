@@ -3,6 +3,7 @@
 (function () {
   const T = I18N.strings(STRINGS);
   I18N.floating();
+  UX.soundButton();
   if (window.ADS_NO_DEMO && !window.CrazyGames) T.ad = ''; // portal sin anuncios todavía: los botones dan el premio directo
   Trophies.init({
     game: 'merge-drop', title: 'Merge Planets', color: '#3a2f8f', floating: true,
@@ -41,8 +42,11 @@
     r0 = w * .042;
     if (oldW && bodies) bodies.forEach(b => { b.r = rad(b.l); });
     aimX = aimX == null ? W / 2 : aimX;
+    land = W - box.w > 300; // horizontal (escritorio): marcador y "siguiente" a los lados de la caja
   }
+  let land = false;
   addEventListener('resize', resize);
+  const clampAim = () => { aimX = Math.max(box.x, Math.min(box.x + box.w, aimX)); };
   const rad = l => r0 * Math.pow(1.24, l);
   const randLevel = () => Math.floor(Math.random() * 5);
 
@@ -60,6 +64,7 @@
     bodies.push({ x, y, px: x, py: y, r, l: cur, age: 0 });
     cur = nxt; nxt = randLevel(); cooldown = .45;
     tone(260, .05);
+    if (coach && coach.active && ++drops >= 8) coach.done(); // por si no hubo fusión todavía
   }
 
   function step(dt) {
@@ -116,6 +121,7 @@
           bodies.push({ x: mx, y: my, px: mx, py: my + 1, r, l, age: 2 });
           score += POINTS[l];
           Trophies.set('planet', l);
+          if (coach && coach.active) coach.done();
           fx.push({ text: `+${POINTS[l]}`, x: mx, y: my, t: 0 });
           tone(330 + l * 70, .12);
           if (l >= 6) Ads.happytime();
@@ -154,6 +160,7 @@
   document.getElementById('bAgain').onclick = async () => { document.getElementById('mOver').classList.remove('show'); await Ads.interstitial(); reset(); };
 
   function tone(f, d) {
+    if (UX.muted) return;
     try {
       const a = tone.ctx || (tone.ctx = new (window.AudioContext || window.webkitAudioContext)());
       const o = a.createOscillator(), gn = a.createGain(); o.type = 'sine';
@@ -164,10 +171,24 @@
 
   // Entrada: mover para apuntar, soltar para dejar caer
   let down = false;
-  cv.addEventListener('pointerdown', e => { down = true; aimX = e.clientX; });
+  cv.addEventListener('pointerdown', e => { down = true; aimX = e.clientX; if (coach) coach.hideHand(); });
   cv.addEventListener('pointermove', e => { aimX = e.clientX; });
   cv.addEventListener('pointerup', () => { if (down) drop(); down = false; });
-  addEventListener('keydown', e => { if (e.code === 'Space') drop(); if (e.code === 'ArrowLeft') aimX -= 20; if (e.code === 'ArrowRight') aimX += 20; });
+  // Teclado: se usa e.code (posición física), así A/D funciona igual en AZERTY (Q/D). Sin Escape ni Ctrl.
+  // preventDefault evita que las flechas o el espacio muevan la página donde está incrustado el juego.
+  const keys = {};
+  addEventListener('keydown', e => {
+    const c = e.code;
+    if (['Space', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyD'].includes(c)) e.preventDefault();
+    if ((c === 'Space' || c === 'Enter' || c === 'ArrowDown') && !e.repeat) { drop(); if (coach) coach.hideHand(); }
+    keys[c] = true;
+  });
+  addEventListener('keyup', e => { keys[e.code] = false; });
+  addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+  function steer(dt) {
+    const dir = (keys.ArrowRight || keys.KeyD ? 1 : 0) - (keys.ArrowLeft || keys.KeyA ? 1 : 0);
+    if (dir) { aimX += dir * box.w * 1.1 * dt; clampAim(); }
+  }
 
   function planet(x, y, r, l, alpha) {
     const [c1, c2] = PLANETS[l];
@@ -191,15 +212,22 @@
   let last = performance.now();
   function frame(now) {
     const dt = Math.min((now - last) / 1000, 1 / 30); last = now;
-    if (!over) { step(dt); checkDanger(dt); cooldown -= dt; }
+    if (!over) { steer(dt); step(dt); checkDanger(dt); cooldown -= dt; }
     ctx.clearRect(0, 0, W, H);
     stars.forEach(([sx, sy, s]) => { ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fillRect(sx * W, sy * H, s, s); });
     // HUD
     ctx.textAlign = 'center'; ctx.fillStyle = '#fff';
-    ctx.font = '800 34px system-ui'; ctx.fillText(score, W / 2, 46);
-    ctx.font = '600 13px system-ui'; ctx.globalAlpha = .7; ctx.fillText(`${T.best} ${best}`, W / 2, 66); ctx.globalAlpha = 1;
-    ctx.textAlign = 'right'; ctx.font = '600 12px system-ui'; ctx.fillText(T.next, W - 16, 30);
-    planet(W - 36, 56, Math.min(rad(nxt), 18), nxt);
+    const scX = land ? box.x / 2 : W / 2, scY = land ? box.y + 40 : 46;
+    ctx.font = '800 34px system-ui'; ctx.fillText(score, scX, scY);
+    ctx.font = '600 13px system-ui'; ctx.globalAlpha = .7; ctx.fillText(`${T.best} ${best}`, scX, scY + 20); ctx.globalAlpha = 1;
+    if (land) {
+      const nx = box.x + box.w + (W - box.x - box.w) / 2;
+      ctx.font = '600 14px system-ui'; ctx.fillText(T.next, nx, box.y + 14);
+      planet(nx, box.y + 52, Math.min(rad(nxt), 26), nxt);
+    } else {
+      ctx.textAlign = 'right'; ctx.font = '600 12px system-ui'; ctx.fillText(T.next, W - 16, 30);
+      planet(W - 36, 56, Math.min(rad(nxt), 18), nxt);
+    }
     // Caja
     ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fillRect(box.x, box.y, box.w, box.h);
     ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 3;
@@ -222,6 +250,14 @@
     requestAnimationFrame(frame);
   }
 
+  // Tutorial la primera vez: la mano apunta moviéndose de lado a lado y suelta; en escritorio también se ven las teclas.
+  let coach = null, drops = 0;
   window.__mp = { get bodies() { return bodies; }, drop, setAim: x => { aimX = x; }, get score() { return score; }, get over() { return over; }, step };
-  resize(); reset(); requestAnimationFrame(frame);
+  resize(); reset();
+  coach = UX.coach('merge-drop', {
+    tip: T.tutorial, keys: `<kbd>←</kbd><kbd>→</kbd> / 🖱️ ${T.aim} &nbsp;·&nbsp; <kbd>Space</kbd> / 🖱️ ${T.drop}`,
+    path: () => [[box.x + box.w * .25, box.y - 30], [box.x + box.w * .7, box.y - 30]],
+    tipY: () => box.y + box.h * .3
+  });
+  requestAnimationFrame(frame);
 })();

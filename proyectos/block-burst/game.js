@@ -3,6 +3,7 @@
 (function () {
   const T = I18N.strings(STRINGS);
   I18N.floating();
+  UX.soundButton();
   if (window.ADS_NO_DEMO && !window.CrazyGames) T.ad = ''; // portal sin anuncios todavía: los botones dan el premio directo
   Trophies.init({
     game: 'block-burst', title: 'Block Burst', color: '#2b3b8f', floating: true,
@@ -33,7 +34,8 @@
   ];
 
   const cv = document.getElementById('c'), ctx = cv.getContext('2d');
-  let W, H, dpr, cell, gx, gy, trayY, trayCell;
+  let W, H, dpr, cell, gx, gy, trayY, trayCell, land, trayX, trayW;
+  const HEAD = 80; // en horizontal: espacio para el marcador encima de la bandeja
   let grid, tray, score, best = +localStorage.getItem('blockburst_best') || 0, combo, sinceClear, revived, over;
   let drag = null, fx = [], parts = [];
 
@@ -41,12 +43,21 @@
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = innerWidth; H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cell = Math.floor(Math.min((W - 24) / N, (H * 0.56) / N, 60));
-    gx = Math.round((W - cell * N) / 2); gy = Math.round(Math.max(90, H * 0.14));
-    trayY = gy + cell * N + Math.max(30, H * 0.04);
-    trayCell = Math.floor(cell * 0.55);
+    land = W > H * 1.25; // pantalla horizontal (escritorio): tablero a la izquierda, piezas a la derecha
+    if (land) {
+      cell = Math.floor(Math.min((H - 40) / N, (W * 0.55) / N, 64));
+      trayW = Math.floor(cell * N * 0.42);
+      gx = Math.round((W - (cell * N + 30 + trayW)) / 2); gy = Math.round((H - cell * N) / 2);
+      trayX = gx + cell * N + 30; trayY = gy + HEAD;
+      trayCell = Math.floor(Math.min(cell * 0.55, (cell * N - HEAD) / 3 / 5.2, trayW / 5.4));
+    } else {
+      cell = Math.floor(Math.min((W - 24) / N, (H * 0.56) / N, 60));
+      gx = Math.round((W - cell * N) / 2); gy = Math.round(Math.max(90, H * 0.14));
+      trayY = gy + cell * N + Math.max(30, H * 0.04);
+      trayCell = Math.floor(cell * 0.55);
+    }
   }
-  addEventListener('resize', resize);
+  addEventListener('resize', () => { resize(); if (coach) coach.update(); });
 
   const newPiece = () => { const s = SHAPES[Math.floor(Math.random() * SHAPES.length)]; return { cells: s, color: Math.floor(Math.random() * COLORS.length), w: Math.max(...s.map(c => c[1])) + 1, h: Math.max(...s.map(c => c[0])) + 1 }; };
   const fits = (p, r, c) => p.cells.every(([dr, dc]) => { const R = r + dr, C = c + dc; return R >= 0 && C >= 0 && R < N && C < N && grid[R][C] < 0; });
@@ -78,6 +89,7 @@
     p.cells.forEach(([dr, dc]) => { grid[r + dr][c + dc] = p.color; });
     score += p.cells.length;
     tray[idx] = null;
+    if (coach && coach.active) coach.done();
     const L = rows.length + cols.length;
     if (L) {
       combo++; sinceClear = 0;
@@ -104,6 +116,7 @@
   }
 
   function tone(f, d) {
+    if (UX.muted) return;
     try {
       const a = tone.ctx || (tone.ctx = new (window.AudioContext || window.webkitAudioContext)());
       const o = a.createOscillator(), g = a.createGain(); o.type = 'triangle';
@@ -138,19 +151,31 @@
   document.getElementById('bAgain').onclick = async () => { document.getElementById('mOver').classList.remove('show'); await Ads.interstitial(); reset(); };
 
   // ---------- Entrada ----------
-  const slotX = i => W / 6 + i * W / 3;
-  const slotCY = () => trayY + trayCell * 2.5;
+  // Centro de cada hueco de la bandeja (abajo en vertical, en columna a la derecha en horizontal)
+  const slotH = () => (cell * N - HEAD) / 3;
+  const slotX = i => land ? trayX + trayW / 2 : W / 6 + i * W / 3;
+  const slotY = i => land ? trayY + slotH() * (i + .5) : trayY + trayCell * 2.5;
+  // Con el dedo la pieza va por encima para que se vea; con el ratón va centrada en el puntero.
+  const lift = mouse => mouse ? 0 : cell * 1.1;
   function dropTarget(px, py) {
     const p = tray[drag.idx];
-    const ox = px - p.w * cell / 2, oy = py - p.h * cell - cell * 1.1;
+    const ox = px - p.w * cell / 2, oy = py - (drag.mouse ? p.h * cell / 2 : p.h * cell) - lift(drag.mouse);
     return { r: Math.round((oy - gy) / cell), c: Math.round((ox - gx) / cell), ox, oy };
+  }
+  // Punto donde soltar la pieza idx para que caiga en (r, c) — lo usan el tutorial y las pruebas.
+  function dropPoint(idx, r, c, mouse) {
+    const p = tray[idx];
+    return [gx + (c + p.w / 2) * cell, gy + r * cell + (mouse ? p.h * cell / 2 : p.h * cell) + lift(mouse)];
   }
   cv.addEventListener('pointerdown', e => {
     if (over) return;
-    if (e.clientY < trayY - 10) return;
-    const i = Math.max(0, Math.min(2, Math.floor(e.clientX / (W / 3))));
+    let i;
+    if (land) { if (e.clientX < trayX - 10) return; i = Math.floor((e.clientY - trayY) / slotH()); }
+    else { if (e.clientY < trayY - 10) return; i = Math.floor(e.clientX / (W / 3)); }
+    i = Math.max(0, Math.min(2, i));
     if (!tray[i]) return;
-    drag = { idx: i, x: e.clientX, y: e.clientY };
+    drag = { idx: i, x: e.clientX, y: e.clientY, mouse: e.pointerType === 'mouse' };
+    if (coach) coach.hideHand();
     cv.setPointerCapture(e.pointerId);
   });
   cv.addEventListener('pointermove', e => { if (drag) { drag.x = e.clientX; drag.y = e.clientY; } });
@@ -176,8 +201,9 @@
     ctx.clearRect(0, 0, W, H);
     // Marcador
     ctx.textAlign = 'center'; ctx.fillStyle = '#fff';
-    ctx.font = '700 14px system-ui'; ctx.globalAlpha = .7; ctx.fillText(`${T.best} ${best}`, W / 2, gy - 58); ctx.globalAlpha = 1;
-    ctx.font = '800 38px system-ui'; ctx.fillText(score, W / 2, gy - 18);
+    const sx = land ? trayX + trayW / 2 : W / 2, sy = land ? gy + 56 : gy - 18;
+    ctx.font = '700 14px system-ui'; ctx.globalAlpha = .7; ctx.fillText(`${T.best} ${best}`, sx, sy - 40); ctx.globalAlpha = 1;
+    ctx.font = '800 38px system-ui'; ctx.fillText(score, sx, sy);
     // Tablero
     ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.roundRect(gx - 6, gy - 6, cell * N + 12, cell * N + 12, 12); ctx.fill();
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
@@ -201,7 +227,7 @@
     tray.forEach((p, i) => {
       if (!p || (drag && drag.idx === i)) return;
       const ok = fitsAnywhere(p);
-      const x0 = slotX(i) - p.w * trayCell / 2, y0 = slotCY() - p.h * trayCell / 2;
+      const x0 = slotX(i) - p.w * trayCell / 2, y0 = slotY(i) - p.h * trayCell / 2;
       p.cells.forEach(([dr, dc]) => block(x0 + dc * trayCell, y0 + dr * trayCell, trayCell, COLORS[p.color], ok ? 1 : .3));
     });
     // Partículas y textos
@@ -218,6 +244,21 @@
     requestAnimationFrame(draw);
   }
 
-  window.__bb = { get grid() { return grid; }, get tray() { return tray; }, get score() { return score; }, place, fits, get over() { return over; } };
-  resize(); reset(); draw();
+  // Tutorial la primera vez: la mano arrastra una pieza que cabe hasta el tablero.
+  function coachPath() {
+    if (over || drag) return null;
+    for (let i = 0; i < 3; i++) {
+      const p = tray[i]; if (!p) continue;
+      for (let r = N - p.h; r >= 0; r--) for (let c = 0; c <= N - p.w; c++) if (fits(p, r, c)) return [[slotX(i), slotY(i)], dropPoint(i, r, c, UX.fine)];
+    }
+    return null;
+  }
+  let coach = null;
+  cv.addEventListener('pointerup', () => { if (coach) coach.update(); });
+
+  window.__bb = { get grid() { return grid; }, get tray() { return tray; }, get score() { return score; }, place, fits, get over() { return over; },
+    slot: i => [slotX(i), slotY(i)], dropPoint };
+  resize(); reset();
+  coach = UX.coach('block-burst', { tip: T.tutorial, path: coachPath, tipY: () => land ? 14 : Math.min(H - 50, trayY + trayCell * 5 + 12) });
+  draw();
 })();
