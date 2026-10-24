@@ -1,0 +1,1 @@
+import{a as i}from"@nf-internal/chunk-RNULGOC3";var e=class extends i{_origin="program";setFocusOrigin(t){return this._origin=t,this}setActiveItem(t){super.setActiveItem(t),this.activeItem&&this.activeItem.focus(this._origin)}};export{e as a};

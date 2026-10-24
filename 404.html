@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Página no encontrada · Better Goal Software</title>
+  <script>
+    // Aplicaciones de una sola página alojadas en subcarpetas: devolver la ruta profunda a la app.
+    (function () {
+      var apps = ['/sastrecloud/'];
+      var p = location.pathname;
+      for (var i = 0; i < apps.length; i++) {
+        if (p.indexOf(apps[i]) === 0) {
+          location.replace(apps[i] + '?ruta=' + encodeURIComponent(p.slice(apps[i].length)) + location.hash);
+          return;
+        }
+      }
+    })();
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; background: #f4f5f7; color: #1b2430; text-align: center; }
+    a { color: #1b3a57; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Página no encontrada</h1>
+    <p><a href="/">Volver al inicio</a></p>
+  </main>
+</body>
+</html>

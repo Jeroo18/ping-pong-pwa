@@ -1,0 +1,6 @@
+{
+  "apiBaseUrl": "/demo-api",
+  "ambiente": "demo",
+  "demo": true,
+  "firebase": { "apiKey": "demo", "authDomain": "demo", "projectId": "demo", "appId": "demo" }
+}

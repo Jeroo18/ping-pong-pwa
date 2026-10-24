@@ -1,0 +1,1 @@
+import{a as e}from"./chunk-R26ZRKLH.js";import"./chunk-2NFLSA4Y.js";e("federation.manifest.json").then(()=>import("./chunk-PCWTPJHW.js")).catch(i=>{console.error(i),document.body.innerHTML='<p style="font-family:system-ui;padding:2rem">No se pudo iniciar SastreCloud. Verifique su conexi\xF3n y recargue la p\xE1gina.</p>'});

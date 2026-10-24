@@ -1,0 +1,1 @@
+import{ElementRef as n}from"@angular/core";function u(r,e=0){return t(r)?Number(r):arguments.length===2?e:0}function t(r){return!isNaN(parseFloat(r))&&!isNaN(Number(r))}function i(r){return r instanceof n?r.nativeElement:r}export{u as a,t as b,i as c};

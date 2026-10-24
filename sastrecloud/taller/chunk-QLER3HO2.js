@@ -1,0 +1,1 @@
+import{b as o}from"@nf-internal/chunk-SMAQMSIK";var O=class{applyChanges(f,l,s,V,c){f.forEachOperation((p,E,m)=>{let t,e;if(p.previousIndex==null){let a=s(p,E,m);t=l.createEmbeddedView(a.templateRef,a.context,a.index),e=o.INSERTED}else m==null?(l.remove(E),e=o.REMOVED):(t=l.get(E),l.move(t,m),e=o.MOVED);c&&c({context:t?.context,operation:e,record:p})})}detach(){}};export{O as a};
