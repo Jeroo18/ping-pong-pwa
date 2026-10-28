@@ -1,12 +1,464 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0b1220"><meta name="description" content="Una colección de juegos rápidos gratis para jugar en el móvil."><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon.svg"><link rel="stylesheet" href="styles.css"><title>Mini Arcade — Juega y diviértete</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Salvador Cuevas · Solutions Architect | Better Goal Software</title>
+<meta name="description" content="Salvador Cuevas, Solutions Architect con 18 años desarrollando software: banca, IA generativa, microservicios, datos a escala y seguridad. Better Goal Software.">
+<meta name="theme-color" content="#05070f">
+<link rel="canonical" href="https://bettergoalsoftware.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bettergoalsoftware.com/">
+<meta property="og:title" content="Salvador Cuevas · Solutions Architect">
+<meta property="og:description" content="18 años de software, 11 en banca. Arquitectura de soluciones, IA generativa y datos a escala.">
+<meta property="og:image" content="https://bettergoalsoftware.com/assets/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/vendor/lenis.css">
+<link rel="stylesheet" href="assets/css/site.css?v=2">
+<link rel="alternate" hreflang="es" href="https://bettergoalsoftware.com/?lang=es">
+<link rel="alternate" hreflang="en" href="https://bettergoalsoftware.com/?lang=en">
+<link rel="alternate" hreflang="pt" href="https://bettergoalsoftware.com/?lang=pt">
+<link rel="alternate" hreflang="fr" href="https://bettergoalsoftware.com/?lang=fr">
+<link rel="alternate" hreflang="de" href="https://bettergoalsoftware.com/?lang=de">
+<link rel="alternate" hreflang="it" href="https://bettergoalsoftware.com/?lang=it">
+<link rel="alternate" hreflang="x-default" href="https://bettergoalsoftware.com/">
+<script>
+  // Idioma antes de pintar: ?lang=xx, o el guardado, o el del navegador (español por defecto).
+  (function () {
+    var ok = ['es', 'en', 'pt', 'fr', 'de', 'it'];
+    var q = new URLSearchParams(location.search).get('lang');
+    var saved = null; try { saved = localStorage.getItem('lang'); } catch (e) {}
+    var nav = (navigator.languages || [navigator.language || 'es']).map(function (l) { return String(l).slice(0, 2).toLowerCase(); });
+    var lang = [q, saved].concat(nav).filter(function (l) { return ok.indexOf(l) > -1; })[0] || 'es';
+    var h = document.documentElement;
+    h.lang = lang;
+    h.classList.add('js');
+    // Las animaciones esconden el contenido al inicio; si los scripts no cargan, se muestra igual.
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      h.classList.add('motion');
+      setTimeout(function () { if (!window.__siteReady) h.classList.remove('motion'); }, 4000);
+    }
+  })();
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Salvador Cuevas","jobTitle":"Solutions Architect","url":"https://bettergoalsoftware.com/","email":"mailto:salvador.cuevas@bettergoalsoftware.com","worksFor":{"@type":"Organization","name":"Better Goal Software","url":"https://bettergoalsoftware.com/"},"alumniOf":["Universidad de Alcalá","UNIBE","ITLA"],"sameAs":["https://www.linkedin.com/in/jeroo","https://github.com/Jeroo18"],"knowsAbout":["Solutions Architecture","Generative AI","Banking","Microservices","Apache Flink","Apache Spark","Kafka","OpenShift","Quarkus",".NET","Security"]}
+</script>
 </head>
-<body><main class="app">
-<header class="topbar"><a class="brand" href="#home"><span class="brand-icon">🕹️</span><span><span class="eyebrow">MINI ARCADE</span><strong>Juega y diviértete</strong></span></a><div class="header-actions"><button id="shareButton" class="share-button" type="button">↗ <span>Compartir</span></button><button id="installButton" class="install-button" hidden>＋ Instalar</button></div></header>
-<section id="home" class="home-view"><div class="hero"><div class="hero-copy"><p class="eyebrow">UN JUEGO PARA CADA MOMENTO</p><h1>¿Tienes un minuto?</h1><p>Elige algo rápido, aprende en segundos y juega directamente aquí.</p></div><div class="hero-art">🎮</div></div>
-<div class="section-heading"><div><h2>Todos los juegos</h2><p>Elige uno y toca para empezar</p></div><span id="gameCount" class="count-pill">15 juegos</span></div><nav class="filters" aria-label="Filtrar juegos"><button class="filter active" data-filter="all">Todos</button><button class="filter" data-filter="arcade">Arcade</button><button class="filter" data-filter="puzzle">Ingenio</button></nav><div id="gameGrid" class="game-grid"></div>
-<section class="install-card"><div class="install-symbol">📲</div><div><h3>Juega también en iPhone</h3><p>Abre en Safari, toca <strong>Compartir → Añadir a pantalla de inicio</strong>. No necesitas permisos especiales; instala cuando quieras.</p></div></section></section>
-<section id="playView" class="play-view" hidden><div class="play-top"><button id="backButton" class="back-button">← Todos los juegos</button><div class="orientation-tools"><span id="orientationLabel" class="orientation-label">Vertical</span><button id="orientationButton" class="orientation-button" type="button">↔ Cambiar orientación</button></div></div><article class="play-heading"><div><span id="gameEmoji" class="play-emoji">🏓</span><h1 id="gameTitle">Juego</h1><p id="gameSubtitle"></p></div><button id="guideButton" class="guide-button">❔ Cómo jugar</button></article><div class="game-stage"><canvas id="gameCanvas" aria-label="Área del juego"></canvas><div id="gameOverlay" class="game-overlay"><div class="overlay-card"><span id="overlayEmoji" class="overlay-emoji">🎮</span><h2 id="overlayTitle">¿Listo?</h2><p id="overlayText"></p><button id="startButton" class="primary-button">Jugar ahora　→</button></div></div></div><div class="play-controls"><p id="controlHint">Toca o arrastra en el juego para controlar.</p><button id="gameActionButton" class="secondary-button" hidden></button><button id="fireButton" class="fire-button" hidden aria-label="Disparar">✦<span>Disparar</span></button><button id="restartButton" class="secondary-button">↻ Reiniciar</button></div><div id="guidePanel" class="guide-panel" hidden><div><span class="guide-kicker">GUÍA RÁPIDA</span><button id="closeGuide" class="close-guide" aria-label="Cerrar guía">×</button></div><h2 id="guideTitle">Cómo jugar</h2><ol id="guideSteps"></ol><button id="guideStart" class="primary-button">Entendido, ¡a jugar! →</button></div></section>
-<footer>15 juegos gratis · Hechos para jugar en el navegador</footer></main><script src="three.min.js"></script><script src="game.js" defer></script></body></html>
+<body>
+<div class="progress" aria-hidden="true"><span></span></div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav">
+  <a class="brand" href="#top" aria-label="Better Goal Software">
+    <img src="assets/img/logo.svg" alt="" width="34" height="34">
+    <span><b>Better Goal</b> Software</span>
+  </a>
+  <nav class="nav-links" aria-label="Secciones">
+    <a href="#perfil" data-i18n="nav.profile">Perfil</a>
+    <a href="#ia" data-i18n="nav.ai">IA</a>
+    <a href="#banca" data-i18n="nav.banking">Banca</a>
+    <a href="#trayectoria" data-i18n="nav.timeline">Trayectoria</a>
+    <a href="#proyectos" data-i18n="nav.projects">Proyectos</a>
+    <a href="#stack" data-i18n="nav.stack">Stack</a>
+  </nav>
+  <div class="nav-actions">
+    <div class="lang">
+      <button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Idioma · Language">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+        <span class="lang-code">ES</span>
+      </button>
+      <ul class="lang-list">
+        <li><a href="?lang=es" data-lang="es" hreflang="es">Español <span>ES</span></a></li>
+        <li><a href="?lang=en" data-lang="en" hreflang="en">English <span>EN</span></a></li>
+        <li><a href="?lang=pt" data-lang="pt" hreflang="pt">Português <span>PT</span></a></li>
+        <li><a href="?lang=fr" data-lang="fr" hreflang="fr">Français <span>FR</span></a></li>
+        <li><a href="?lang=de" data-lang="de" hreflang="de">Deutsch <span>DE</span></a></li>
+        <li><a href="?lang=it" data-lang="it" hreflang="it">Italiano <span>IT</span></a></li>
+      </ul>
+    </div>
+    <a class="btn btn-small magnetic" href="#contacto" data-i18n="nav.cta">Hablemos</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <canvas id="neural" aria-hidden="true"></canvas>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow reveal-up"><span class="dot"></span><span data-i18n="hero.eyebrow">Solutions Architect · Banca · IA generativa</span></p>
+      <h1 class="hero-title split" data-i18n-html="hero.title">Diseño software que mueve <em>bancos</em>, gobiernos y <em>miles de millones</em> de datos.</h1>
+      <p class="hero-sub reveal-up" data-i18n-html="hero.sub">Soy <b>Salvador Cuevas</b>. Llevo 18 años desarrollando software y hoy trabajo como Solutions Architect: diseño la plataforma de auditoría continua de Banreservas y uso IA generativa en todo el ciclo, de la arquitectura al code review.</p>
+      <div class="hero-cta reveal-up">
+        <a class="btn magnetic" href="#trayectoria"><span data-i18n="hero.cta1">Ver mi trayectoria</span> <i>→</i></a>
+        <a class="btn btn-ghost magnetic" href="#contacto" data-i18n="hero.cta2">Contactar</a>
+      </div>
+    </div>
+    <div class="wrap stats">
+      <div class="stat"><b><span class="count" data-to="18">18</span>+</b><span data-i18n="stat.years">años desarrollando software</span></div>
+      <div class="stat"><b><span class="count" data-to="11">11</span></b><span data-i18n="stat.bank">años en Banreservas, el banco más grande de R.D.</span></div>
+      <div class="stat"><b><span class="count" data-to="9">9</span>+</b><span data-i18n="stat.ai">años con IA · 3 con IA generativa</span></div>
+      <div class="stat"><b><span class="count" data-to="20">20</span></b><span data-i18n="stat.team">personas lideradas en 10+ proyectos a la vez</span></div>
+    </div>
+    <a class="scroll-hint" href="#perfil" aria-label="Bajar"><span></span></a>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Solutions Architecture</span><span>IA generativa</span><span>Apache Flink</span><span>Kafka</span><span>Apache Spark</span><span>Quarkus</span><span>.NET 8</span><span>Azure Red Hat OpenShift</span><span>Keycloak · OIDC</span><span>Clean Architecture</span><span>Multi-tenant</span><span>DevSecOps</span><span>Angular</span><span>Vue.js</span><span>React</span>
+    </div>
+  </div>
+
+  <!-- PERFIL -->
+  <section id="perfil" class="section">
+    <div class="wrap">
+      <p class="kicker"><span>01</span> <span data-i18n="profile.kicker">Perfil</span></p>
+      <p class="manifesto" data-i18n="profile.manifesto">Traduzco retos de negocio en arquitecturas viables y las explico igual de claro a un equipo técnico que a la dirección. Más de una década en el sector financiero, cinco años en remoto para el gobierno de Puerto Rico y una obsesión: software seguro, auditable y que escale.</p>
+      <div class="pillars">
+        <article class="card tilt reveal-card">
+          <div class="card-icon">◇</div>
+          <h3 data-i18n="pillar1.t">Arquitectura de punta a punta</h3>
+          <p data-i18n="pillar1.d">Microservicios, integración, eventos y datos. Documento decisiones, atributos de calidad y trade-offs de costo, rendimiento y seguridad.</p>
+        </article>
+        <article class="card tilt reveal-card">
+          <div class="card-icon">⬡</div>
+          <h3 data-i18n="pillar2.t">Seguridad desde el diseño</h3>
+          <p data-i18n="pillar2.d">Nueve años en ciberseguridad: Keycloak, OAuth2/OIDC, JWT, gestión de secretos, hardening y validaciones antes de producción.</p>
+        </article>
+        <article class="card tilt reveal-card">
+          <div class="card-icon">△</div>
+          <h3 data-i18n="pillar3.t">Liderazgo técnico hands-on</h3>
+          <p data-i18n="pillar3.d">Code reviews, mentoría y backlog técnico. He sido Scrum Master, Product Owner y desarrollador senior al mismo tiempo.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section id="ia" class="section section-ai">
+    <div class="wrap ai-grid">
+      <div class="ai-copy">
+        <p class="kicker"><span>02</span> <span data-i18n="ai.kicker">Inteligencia artificial</span></p>
+        <h2 class="h2 split" data-i18n-html="ai.title">La IA ya es parte de cómo <em>diseño, construyo y reviso</em> software.</h2>
+        <p class="lead reveal-up" data-i18n="ai.lead">Más de 9 años trabajando con IA y 3 usando IA generativa a diario en desarrollo, arquitectura y revisión de código. Me interesa la IA que llega a producción: útil, medible, segura y gobernada.</p>
+        <div class="ai-cards">
+          <article class="mini reveal-card">
+            <h3 data-i18n="ai.c1.t">IA generativa en el ciclo de desarrollo</h3>
+            <p data-i18n="ai.c1.d">Diseño de arquitectura, decisiones documentadas (ADR), generación y revisión de código, pruebas y documentación con asistentes de IA, siempre con revisión humana.</p>
+          </article>
+          <article class="mini reveal-card">
+            <h3 data-i18n="ai.c2.t">LLM dentro del navegador</h3>
+            <p data-i18n="ai.c2.d">Asistente con modelos que corren en el propio dispositivo (WebLLM + WebGPU, Qwen2.5), sin servidor, y modo con APIs de Gemini, Groq, OpenRouter u OpenAI.</p>
+          </article>
+          <article class="mini reveal-card">
+            <h3 data-i18n="ai.c3.t">Datos listos para IA</h3>
+            <p data-i18n="ai.c3.d">Pipelines con Flink, Spark y Kafka que cuidan calidad, trazabilidad y gobierno del dato: la base que un modelo necesita para dar respuestas confiables.</p>
+          </article>
+          <article class="mini reveal-card">
+            <h3 data-i18n="ai.c4.t">IA segura y auditable</h3>
+            <p data-i18n="ai.c4.d">Identidad, permisos, secretos y registros aplicados también a soluciones con IA. Vengo de la banca: si no se puede auditar, no sale a producción.</p>
+          </article>
+        </div>
+      </div>
+      <div class="ai-visual">
+        <div class="terminal reveal-card" aria-label="Ejemplo ilustrativo de trabajo con un asistente de IA">
+          <div class="term-bar"><i></i><i></i><i></i><span>architect · copilot</span></div>
+          <div class="term-body">
+            <p class="tl"><span class="p">›</span> <span data-i18n="term.1">diseña un pipeline de auditoría continua para transacciones</span></p>
+            <p class="tl ok"><span class="p">✓</span> Kafka → Flink (micro-batching) → <span data-i18n="term.2">reglas de control</span></p>
+            <p class="tl ok"><span class="p">✓</span> <span data-i18n="term.3">hallazgos</span> → API Quarkus · Keycloak OIDC</p>
+            <p class="tl ok"><span class="p">✓</span> ADR-012 · trade-offs: <span data-i18n="term.4">costo / latencia / seguridad</span></p>
+            <p class="tl"><span class="p">›</span> <span data-i18n="term.5">revisa el PR #418 contra los lineamientos de seguridad</span></p>
+            <p class="tl warn"><span class="p">!</span> <span data-i18n="term.6">secreto en texto plano en config → mover a vault</span></p>
+            <p class="tl ok"><span class="p">✓</span> <span data-i18n="term.7">listo para revisión humana</span><span class="caret"></span></p>
+          </div>
+        </div>
+        <div class="orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BANCA -->
+  <section id="banca" class="section section-bank">
+    <div class="bank-pin">
+      <div class="wrap bank-grid">
+        <div class="bank-copy">
+          <p class="kicker"><span>03</span> <span data-i18n="bank.kicker">Banca · Banreservas</span></p>
+          <h2 class="h2" data-i18n-html="bank.title">11 años en el banco más grande de <em>República Dominicana</em>.</h2>
+          <p class="lead" data-i18n="bank.lead">Desde 2015. Empecé en el Laboratorio de Innovación construyendo backend y arquitectura, y hoy lidero el equipo que diseña la plataforma de auditoría continua del banco.</p>
+          <ol class="bank-steps">
+            <li class="is-active"><b>01</b><div><h3 data-i18n="bank.s1.t">Ingesta</h3><p data-i18n="bank.s1.d">Fuentes transaccionales y operativas de alta criticidad entran por Kafka.</p></div></li>
+            <li><b>02</b><div><h3 data-i18n="bank.s2.t">Procesamiento masivo</h3><p data-i18n="bank.s2.d">Apache Flink y Spark con micro-batching, paralelización y flujos distribuidos sobre miles de millones de registros.</p></div></li>
+            <li><b>03</b><div><h3 data-i18n="bank.s3.t">Microservicios</h3><p data-i18n="bank.s3.d">Servicios Quarkus y .NET en Azure Red Hat OpenShift (ARO), integrados con los sistemas del banco.</p></div></li>
+            <li><b>04</b><div><h3 data-i18n="bank.s4.t">Seguridad corporativa</h3><p data-i18n="bank.s4.d">Keycloak, OAuth2/OIDC, JWT, X-API-Key, secretos y hardening. Controles revisados antes de producción.</p></div></li>
+            <li><b>05</b><div><h3 data-i18n="bank.s5.t">Entrega continua</h3><p data-i18n="bank.s5.d">CI/CD en Azure DevOps, contenedores, observabilidad y Trunk-Based Development.</p></div></li>
+          </ol>
+        </div>
+        <div class="bank-diagram" aria-hidden="true">
+          <svg viewBox="0 0 520 560" class="arch">
+            <defs>
+              <linearGradient id="gline" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+              <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <g class="shield n4"><rect x="20" y="138" width="480" height="312" rx="26"/><text x="44" y="246">Keycloak · OIDC · JWT</text></g>
+            <g class="wires" fill="none" stroke="url(#gline)" stroke-width="2">
+              <path class="wire w1" d="M120 80 C 120 130, 260 110, 260 160"/>
+              <path class="wire w1" d="M260 80 L260 160"/>
+              <path class="wire w1" d="M400 80 C 400 130, 260 110, 260 160"/>
+              <path class="wire w2" d="M260 210 L260 260"/>
+              <path class="wire w3" d="M260 310 C 260 350, 140 340, 140 380"/>
+              <path class="wire w3" d="M260 310 L260 380"/>
+              <path class="wire w3" d="M260 310 C 260 350, 380 340, 380 380"/>
+              <path class="wire w5" d="M140 430 C 140 470, 260 460, 260 490"/>
+              <path class="wire w5" d="M380 430 C 380 470, 260 460, 260 490"/>
+            </g>
+            <g class="nodes">
+              <g class="node n1"><rect x="60" y="40" width="120" height="40" rx="12"/><text x="120" y="65">Core</text></g>
+              <g class="node n1"><rect x="200" y="40" width="120" height="40" rx="12"/><text x="260" y="65" data-i18n="bank.ch">Canales</text></g>
+              <g class="node n1"><rect x="340" y="40" width="120" height="40" rx="12"/><text x="400" y="65" data-i18n="bank.ops">Operaciones</text></g>
+              <g class="node n1 hl"><rect x="170" y="160" width="180" height="50" rx="14"/><text x="260" y="190">Kafka</text></g>
+              <g class="node n2 hl"><rect x="150" y="260" width="220" height="50" rx="14"/><text x="260" y="290">Flink · Spark</text></g>
+              <g class="node n3"><rect x="70" y="380" width="140" height="50" rx="14"/><text x="140" y="410">Quarkus</text></g>
+              <g class="node n3"><rect x="215" y="380" width="90" height="50" rx="14"/><text x="260" y="410">ARO</text></g>
+              <g class="node n3"><rect x="310" y="380" width="140" height="50" rx="14"/><text x="380" y="410">.NET</text></g>
+              <g class="node n5 hl"><rect x="160" y="490" width="200" height="50" rx="14"/><text x="260" y="520" data-i18n="bank.out">Hallazgos</text></g>
+            </g>
+            <circle class="packet" r="5" cx="260" cy="60" filter="url(#glow)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAYECTORIA -->
+  <section id="trayectoria" class="section section-timeline">
+    <div class="wrap">
+      <p class="kicker"><span>04</span> <span data-i18n="tl.kicker">Trayectoria</span></p>
+      <h2 class="h2 split" data-i18n-html="tl.title">De administrar sistemas a <em>diseñar soluciones</em> para bancos y gobiernos.</h2>
+    </div>
+    <div class="tl-viewport">
+      <div class="tl-track">
+        <div class="tl-line" aria-hidden="true"><span></span></div>
+
+        <article class="tl-item">
+          <time>2010 — 2013</time>
+          <h3 data-i18n="tl.momatos.r">Administrador de Sistemas</h3>
+          <p class="org">Matos Corredores de Seguros</p>
+          <p data-i18n="tl.momatos.d">Administré el CRM de pólizas, nómina y cuentas por cobrar y pagar, en el sector seguros.</p>
+          <p class="tags">ASP · Visual Basic · SQL Server</p>
+        </article>
+        <article class="tl-item edu">
+          <time>2012</time>
+          <h3 data-i18n="tl.itla.r">Tecnólogo en Software</h3>
+          <p class="org">ITLA</p>
+          <p data-i18n="tl.itla.d">La base técnica: programación, bases de datos e ingeniería de software.</p>
+        </article>
+        <article class="tl-item">
+          <time>2013 — 2017</time>
+          <h3 data-i18n="tl.one.r">Desarrollador de Sistemas</h3>
+          <p class="org" data-i18n="tl.one.o">Oficina Nacional de Estadística</p>
+          <p data-i18n="tl.one.d">APIs REST, plataformas web y soluciones de datos para las estadísticas oficiales del país y organismos internacionales.</p>
+          <p class="tags">.NET MVC · Oracle · SQL Server</p>
+        </article>
+        <article class="tl-item big">
+          <time>2015</time>
+          <h3 data-i18n="tl.lab.r">Backend y Arquitectura · Laboratorio de Innovación</h3>
+          <p class="org">Banreservas</p>
+          <p data-i18n="tl.lab.d">Entro al banco. Servicios Quarkus y Java, APIs REST, arquitectura modular en contenedores y adopción de DevSecOps.</p>
+          <p class="tags">Quarkus · Java · OpenShift · OAuth2</p>
+        </article>
+        <article class="tl-item edu">
+          <time>2016</time>
+          <h3 data-i18n="tl.unibe.r">Ingeniería en TIC</h3>
+          <p class="org">UNIBE</p>
+          <p data-i18n="tl.unibe.d">Ingeniería en Tecnologías de la Información y Comunicación.</p>
+        </article>
+        <article class="tl-item">
+          <time>2017 — 2018</time>
+          <h3 data-i18n="tl.map.r">Líder de Proyecto</h3>
+          <p class="org" data-i18n="tl.map.o">Ministerio de Administración Pública</p>
+          <p data-i18n="tl.map.d">Cálculo de beneficios laborales, certificación de servidores de carrera y cartas compromiso al ciudadano.</p>
+          <p class="tags">.NET MVC · Java EE · JSP</p>
+        </article>
+        <article class="tl-item edu">
+          <time>2018</time>
+          <h3 data-i18n="tl.uah.r">Máster en Ingeniería del Software</h3>
+          <p class="org" data-i18n="tl.uah.o">Universidad de Alcalá, España</p>
+          <p data-i18n="tl.uah.d">Arquitectura, calidad y gestión de proyectos de software.</p>
+        </article>
+        <article class="tl-item">
+          <time>2018 — 2020</time>
+          <h3 data-i18n="tl.khensys.r">Consultor Senior · Lead Developer</h3>
+          <p class="org">Khensys Corporation</p>
+          <p data-i18n="tl.khensys.d">Módulos críticos para Educación Especial de Puerto Rico. Ascendido a líder de equipo en 6 meses.</p>
+          <p class="tags">.NET Core · Vue.js · GraphQL · Power BI</p>
+        </article>
+        <article class="tl-item">
+          <time>2020 — 2021</time>
+          <h3 data-i18n="tl.mardom.r">Encargado de Sistemas de Información</h3>
+          <p class="org">Marítima Dominicana (MARDOM)</p>
+          <p data-i18n="tl.mardom.d">Equipo de 20 personas en más de 10 proyectos a la vez. Dynamics 365 F&amp;O y sus integraciones en producción en menos de 6 meses.</p>
+          <p class="tags">Dynamics 365 · .NET Core · Angular · Scrum</p>
+        </article>
+        <article class="tl-item big">
+          <time data-i18n="tl.sbd.t">2021 — hoy</time>
+          <h3 data-i18n="tl.sbd.r">Arquitecto de Software y Consultor Senior</h3>
+          <p class="org" data-i18n="tl.sbd.o">Solutions By Design · Puerto Rico (remoto)</p>
+          <p data-i18n="tl.sbd.d">WIOA (SAIL) y DTOP/SERMUN para el gobierno de Puerto Rico: Clean Architecture, multi-tenant e identidad federada. Scrum Master, Product Owner y desarrollador senior.</p>
+          <p class="tags">.NET 8 · Angular · Duende IDP · Azure DevOps</p>
+        </article>
+        <article class="tl-item big now">
+          <time data-i18n="tl.br.t">Hoy</time>
+          <h3 data-i18n="tl.br.r">Arquitecto de Software · Auditoría Continua</h3>
+          <p class="org">Banreservas</p>
+          <p data-i18n="tl.br.d">Lidero el equipo que automatiza auditorías sobre miles de millones de registros: microservicios en ARO, Flink, Spark y Kafka.</p>
+          <p class="tags">ARO · Flink · Spark · Kafka · Keycloak</p>
+        </article>
+        <article class="tl-item big now">
+          <time>2026</time>
+          <h3 data-i18n="tl.bgs.r">Solutions Architect · Fundador</h3>
+          <p class="org">Better Goal Software</p>
+          <p data-i18n="tl.bgs.d">Mi marca propia: productos web con IA, SaaS y consultoría de arquitectura de soluciones.</p>
+          <p class="tags">IA generativa · PWA · SaaS</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS -->
+  <section id="proyectos" class="section">
+    <div class="wrap">
+      <p class="kicker"><span>05</span> <span data-i18n="pr.kicker">Proyectos</span></p>
+      <h2 class="h2 split" data-i18n-html="pr.title">Sistemas de <em>misión crítica</em> y productos propios.</h2>
+      <div class="projects">
+        <article class="project tilt reveal-card wide">
+          <span class="badge" data-i18n="pr.bank">Banca</span>
+          <h3 data-i18n="pr.p1.t">Plataforma de Auditoría Continua</h3>
+          <p data-i18n="pr.p1.d">Automatiza auditorías, controles y análisis sobre miles de millones de registros de fuentes transaccionales y operativas de Banreservas.</p>
+          <p class="tags">ARO · Flink · Spark · Kafka · Quarkus · .NET · Keycloak</p>
+        </article>
+        <article class="project tilt reveal-card">
+          <span class="badge" data-i18n="pr.gov">Gobierno de Puerto Rico</span>
+          <h3>WIOA (SAIL)</h3>
+          <p data-i18n="pr.p2.d">Timesheets, nómina y solicitudes. Clean Architecture, multi-tenant e identidad federada con Duende IDP.</p>
+          <p class="tags">.NET 6/8 · Minimal API · Angular</p>
+        </article>
+        <article class="project tilt reveal-card">
+          <span class="badge" data-i18n="pr.gov">Gobierno de Puerto Rico</span>
+          <h3>DTOP / SERMUN</h3>
+          <p data-i18n="pr.p3.d">Permisos, flujos de trabajo e inspecciones para el gobierno.</p>
+          <p class="tags">.NET · SQL Server · SSRS</p>
+        </article>
+        <article class="project tilt reveal-card">
+          <span class="badge" data-i18n="pr.log">Logística</span>
+          <h3 data-i18n="pr.p4.t">Dynamics 365 F&amp;O · MARDOM GO</h3>
+          <p data-i18n="pr.p4.d">Puesta en producción del ERP, integraciones satélite, MARDOM GO y el sistema de Talleres en menos de 6 meses.</p>
+          <p class="tags">Dynamics 365 · .NET Core · Angular</p>
+        </article>
+        <article class="project tilt reveal-card">
+          <span class="badge" data-i18n="pr.edu">Educación</span>
+          <h3 data-i18n="pr.p5.t">Educación Especial de Puerto Rico</h3>
+          <p data-i18n="pr.p5.d">Querellas, Mi Portal Especial, dashboards, reportes e integraciones.</p>
+          <p class="tags">.NET Core · Vue.js · GraphQL · Power BI</p>
+        </article>
+        <a class="project tilt reveal-card link" href="sastrecloud/">
+          <span class="badge accent">SaaS · demo</span>
+          <h3>SastreCloud</h3>
+          <p data-i18n="pr.p6.d">SaaS para sastrerías con microfrontend Angular, BFF en NestJS y microservicios Quarkus.</p>
+          <p class="tags">Angular MFE · NestJS · Quarkus <i>↗</i></p>
+        </a>
+        <a class="project tilt reveal-card link wide" href="proyectos/">
+          <span class="badge accent" data-i18n="pr.ai">Productos con IA</span>
+          <h3 data-i18n="pr.p7.t">Apps Better Goal</h3>
+          <p data-i18n="pr.p7.d">Enfoque, Mi Mascota con asistente de IA en el dispositivo, y Merge Planets 3D. En 14 idiomas.</p>
+          <p class="tags">PWA · WebLLM · WebGPU · PixiJS <i>↗</i></p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section id="stack" class="section">
+    <div class="wrap">
+      <p class="kicker"><span>06</span> <span data-i18n="st.kicker">Stack y formación</span></p>
+      <h2 class="h2 split" data-i18n-html="st.title">Herramientas que uso <em>en producción</em>.</h2>
+      <div class="stack-grid">
+        <div class="stack-col reveal-card"><h3>Cloud</h3><ul class="chips"><li>Azure Red Hat OpenShift</li><li>Azure DevOps</li><li>AWS</li><li>Docker</li><li>Kubernetes</li></ul></div>
+        <div class="stack-col reveal-card"><h3 data-i18n="st.arch">Arquitectura</h3><ul class="chips"><li data-i18n="st.ms">Microservicios</li><li>Event streaming</li><li>Clean Architecture</li><li>Multi-tenant</li><li>REST APIs</li></ul></div>
+        <div class="stack-col reveal-card"><h3 data-i18n="st.data">Datos</h3><ul class="chips"><li>Apache Flink</li><li>Apache Spark</li><li>Kafka</li><li>SQL Server</li><li>Oracle</li><li>MongoDB</li><li>PostgreSQL</li></ul></div>
+        <div class="stack-col reveal-card"><h3>Backend</h3><ul class="chips"><li>Quarkus</li><li>Java</li><li>.NET 8 / C#</li><li>Python</li><li>NestJS</li></ul></div>
+        <div class="stack-col reveal-card"><h3 data-i18n="st.sec">Seguridad</h3><ul class="chips"><li>Keycloak</li><li>OAuth2 / OIDC</li><li>JWT</li><li>Duende IDP</li><li>Trivy · NVD</li></ul></div>
+        <div class="stack-col reveal-card"><h3>Frontend</h3><ul class="chips"><li>Angular</li><li>Vue.js</li><li>React</li><li>TypeScript</li><li>Three.js</li></ul></div>
+      </div>
+      <div class="edu-grid">
+        <div class="edu reveal-card">
+          <h3 data-i18n="st.lead">Liderazgo y métodos ágiles</h3>
+          <ul>
+            <li data-i18n="st.l1">Scrum Master en práctica</li>
+            <li data-i18n="st.l2">Product Owner y gestión de backlog</li>
+            <li>Trunk-Based Development</li>
+            <li>Kanban · XP · SAFe</li>
+            <li data-i18n="st.l5">Mentoría técnica y code review</li>
+          </ul>
+        </div>
+        <div class="edu reveal-card">
+          <h3 data-i18n="st.edu">Educación</h3>
+          <ul>
+            <li><b data-i18n="tl.uah.r">Máster en Ingeniería del Software</b><span>Universidad de Alcalá · 2018</span></li>
+            <li><b data-i18n="tl.unibe.r">Ingeniería en TIC</b><span>UNIBE · 2016</span></li>
+            <li><b data-i18n="tl.itla.r">Tecnólogo en Software</b><span>ITLA · 2012</span></li>
+          </ul>
+        </div>
+        <div class="edu reveal-card">
+          <h3 data-i18n="st.cert">Certificaciones e idiomas</h3>
+          <ul>
+            <li>Microsoft Technology Associate</li>
+            <li data-i18n="st.iso">ISO 9001 · Gestión de Calidad</li>
+            <li data-i18n="st.es">Español nativo</li>
+            <li data-i18n="st.en">Inglés intermedio alto (B2)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="section contact">
+    <div class="wrap">
+      <p class="kicker center"><span>07</span> <span data-i18n="ct.kicker">Contacto</span></p>
+      <h2 class="contact-title split" data-i18n-html="ct.title">¿Construimos algo <em>que escale</em>?</h2>
+      <p class="lead center reveal-up" data-i18n="ct.lead">Arquitectura de soluciones, modernización, plataformas de datos o IA aplicada. Escríbeme y te respondo pronto.</p>
+      <div class="contact-cta reveal-up">
+        <a class="btn btn-big magnetic" href="mailto:salvador.cuevas@bettergoalsoftware.com">salvador.cuevas@bettergoalsoftware.com</a>
+      </div>
+      <div class="socials reveal-up">
+        <a href="https://www.linkedin.com/in/jeroo" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a href="https://github.com/Jeroo18" target="_blank" rel="noopener">GitHub ↗</a>
+        <span data-i18n="ct.loc">Santo Domingo, R.D. · Remoto</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span>© 2026 Better Goal Software · Salvador Cuevas</span>
+    <a href="#top" data-i18n="ft.top">Volver arriba ↑</a>
+  </div>
+</footer>
+
+<script src="assets/vendor/three.min.js" defer></script>
+<script src="assets/vendor/gsap.min.js" defer></script>
+<script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+<script src="assets/vendor/SplitText.min.js" defer></script>
+<script src="assets/vendor/lenis.min.js" defer></script>
+<script src="assets/js/i18n.js?v=2" defer></script>
+<script src="assets/js/site.js?v=2" defer></script>
+</body>
+</html>
