@@ -8,7 +8,7 @@
     'nav.projects': 'Projects', 'nav.stack': 'Stack', 'nav.cta': "Let's talk",
     'hero.eyebrow': 'Solutions Architect · Banking · Generative AI',
     'hero.title': 'I design software that moves <em>banks</em>, governments and <em>billions</em> of records.',
-    'hero.sub': "I'm <b>Salvador Cuevas</b>. I've been building software for 18 years and today I work as a Solutions Architect: I design Banreservas' continuous audit platform and use generative AI across the whole lifecycle, from architecture to code review.",
+    'hero.sub': "I'm <b>Salvador Cuevas</b>. I've been building software for 16 years and today I work as a Solutions Architect: I design Banreservas' continuous audit platform and use generative AI across the whole lifecycle, from architecture to code review.",
     'hero.cta1': 'See my journey', 'hero.cta2': 'Get in touch',
     'stat.years': 'years building software',
     'stat.bank': "years at Banreservas, the Dominican Republic's largest bank",
@@ -98,7 +98,7 @@
     'ct.lead': "Solutions architecture, modernization, data platforms or applied AI. Drop me a line and I'll get back to you soon.",
     'ct.loc': 'Santo Domingo, D.R. · Remote',
     'ft.top': 'Back to top ↑',
-    'meta.desc': 'Salvador Cuevas, Solutions Architect with 18 years building software: banking, generative AI, microservices, data at scale and security.'
+    'meta.desc': 'Salvador Cuevas, Solutions Architect with 16 years building software: banking, generative AI, microservices, data at scale and security.'
   };
 
   T.pt = {
@@ -106,7 +106,7 @@
     'nav.projects': 'Projetos', 'nav.stack': 'Stack', 'nav.cta': 'Vamos conversar',
     'hero.eyebrow': 'Solutions Architect · Banca · IA generativa',
     'hero.title': 'Projeto software que move <em>bancos</em>, governos e <em>bilhões</em> de registros.',
-    'hero.sub': 'Sou <b>Salvador Cuevas</b>. Desenvolvo software há 18 anos e hoje atuo como Solutions Architect: projeto a plataforma de auditoria contínua do Banreservas e uso IA generativa em todo o ciclo, da arquitetura ao code review.',
+    'hero.sub': 'Sou <b>Salvador Cuevas</b>. Desenvolvo software há 16 anos e hoje atuo como Solutions Architect: projeto a plataforma de auditoria contínua do Banreservas e uso IA generativa em todo o ciclo, da arquitetura ao code review.',
     'hero.cta1': 'Ver minha trajetória', 'hero.cta2': 'Entrar em contato',
     'stat.years': 'anos desenvolvendo software',
     'stat.bank': 'anos no Banreservas, o maior banco da República Dominicana',
@@ -196,7 +196,7 @@
     'ct.lead': 'Arquitetura de soluções, modernização, plataformas de dados ou IA aplicada. Escreva para mim e respondo em breve.',
     'ct.loc': 'Santo Domingo, R.D. · Remoto',
     'ft.top': 'Voltar ao topo ↑',
-    'meta.desc': 'Salvador Cuevas, Solutions Architect com 18 anos desenvolvendo software: banca, IA generativa, microsserviços, dados em escala e segurança.'
+    'meta.desc': 'Salvador Cuevas, Solutions Architect com 16 anos desenvolvendo software: banca, IA generativa, microsserviços, dados em escala e segurança.'
   };
 
   T.fr = {
@@ -204,7 +204,7 @@
     'nav.projects': 'Projets', 'nav.stack': 'Stack', 'nav.cta': 'Discutons',
     'hero.eyebrow': 'Solutions Architect · Banque · IA générative',
     'hero.title': 'Je conçois des logiciels qui font tourner <em>banques</em>, gouvernements et <em>milliards</em> de données.',
-    'hero.sub': "Je suis <b>Salvador Cuevas</b>. Je développe des logiciels depuis 18 ans et je travaille aujourd'hui comme Solutions Architect : je conçois la plateforme d'audit continu de Banreservas et j'utilise l'IA générative sur tout le cycle, de l'architecture à la revue de code.",
+    'hero.sub': "Je suis <b>Salvador Cuevas</b>. Je développe des logiciels depuis 16 ans et je travaille aujourd'hui comme Solutions Architect : je conçois la plateforme d'audit continu de Banreservas et j'utilise l'IA générative sur tout le cycle, de l'architecture à la revue de code.",
     'hero.cta1': 'Voir mon parcours', 'hero.cta2': 'Me contacter',
     'stat.years': 'ans à développer des logiciels',
     'stat.bank': 'ans chez Banreservas, la plus grande banque de République dominicaine',
@@ -294,7 +294,7 @@
     'ct.lead': "Architecture de solutions, modernisation, plateformes de données ou IA appliquée. Écrivez-moi, je vous réponds rapidement.",
     'ct.loc': 'Saint-Domingue, R.D. · À distance',
     'ft.top': 'Retour en haut ↑',
-    'meta.desc': 'Salvador Cuevas, Solutions Architect avec 18 ans de développement logiciel : banque, IA générative, microservices, données à grande échelle et sécurité.'
+    'meta.desc': 'Salvador Cuevas, Solutions Architect avec 16 ans de développement logiciel : banque, IA générative, microservices, données à grande échelle et sécurité.'
   };
 
   T.de = {
@@ -302,7 +302,7 @@
     'nav.projects': 'Projekte', 'nav.stack': 'Stack', 'nav.cta': 'Kontakt',
     'hero.eyebrow': 'Solutions Architect · Banking · Generative KI',
     'hero.title': 'Ich entwerfe Software, die <em>Banken</em>, Behörden und <em>Milliarden</em> Datensätze bewegt.',
-    'hero.sub': 'Ich bin <b>Salvador Cuevas</b>. Seit 18 Jahren entwickle ich Software und arbeite heute als Solutions Architect: Ich entwerfe die Continuous-Audit-Plattform der Banreservas und setze generative KI im gesamten Lebenszyklus ein, von der Architektur bis zum Code-Review.',
+    'hero.sub': 'Ich bin <b>Salvador Cuevas</b>. Seit 16 Jahren entwickle ich Software und arbeite heute als Solutions Architect: Ich entwerfe die Continuous-Audit-Plattform der Banreservas und setze generative KI im gesamten Lebenszyklus ein, von der Architektur bis zum Code-Review.',
     'hero.cta1': 'Meinen Werdegang ansehen', 'hero.cta2': 'Kontakt aufnehmen',
     'stat.years': 'Jahre Softwareentwicklung',
     'stat.bank': 'Jahre bei Banreservas, der größten Bank der Dominikanischen Republik',
@@ -392,7 +392,7 @@
     'ct.lead': 'Lösungsarchitektur, Modernisierung, Datenplattformen oder angewandte KI. Schreiben Sie mir, ich melde mich zeitnah.',
     'ct.loc': 'Santo Domingo, D.R. · Remote',
     'ft.top': 'Nach oben ↑',
-    'meta.desc': 'Salvador Cuevas, Solutions Architect mit 18 Jahren Softwareentwicklung: Banking, generative KI, Microservices, Daten im großen Maßstab und Sicherheit.'
+    'meta.desc': 'Salvador Cuevas, Solutions Architect mit 16 Jahren Softwareentwicklung: Banking, generative KI, Microservices, Daten im großen Maßstab und Sicherheit.'
   };
 
   T.it = {
@@ -400,7 +400,7 @@
     'nav.projects': 'Progetti', 'nav.stack': 'Stack', 'nav.cta': 'Parliamone',
     'hero.eyebrow': 'Solutions Architect · Banca · IA generativa',
     'hero.title': 'Progetto software che muove <em>banche</em>, governi e <em>miliardi</em> di dati.',
-    'hero.sub': 'Sono <b>Salvador Cuevas</b>. Sviluppo software da 18 anni e oggi lavoro come Solutions Architect: progetto la piattaforma di audit continuo di Banreservas e uso l\'IA generativa in tutto il ciclo, dall\'architettura alla code review.',
+    'hero.sub': 'Sono <b>Salvador Cuevas</b>. Sviluppo software da 16 anni e oggi lavoro come Solutions Architect: progetto la piattaforma di audit continuo di Banreservas e uso l\'IA generativa in tutto il ciclo, dall\'architettura alla code review.',
     'hero.cta1': 'Scopri il mio percorso', 'hero.cta2': 'Contattami',
     'stat.years': 'anni di sviluppo software',
     'stat.bank': 'anni in Banreservas, la banca più grande della Repubblica Dominicana',
@@ -490,7 +490,7 @@
     'ct.lead': "Architettura delle soluzioni, modernizzazione, piattaforme dati o IA applicata. Scrivimi e ti risponderò presto.",
     'ct.loc': 'Santo Domingo, R.D. · Da remoto',
     'ft.top': 'Torna su ↑',
-    'meta.desc': "Salvador Cuevas, Solutions Architect con 18 anni di sviluppo software: banca, IA generativa, microservizi, dati su larga scala e sicurezza."
+    'meta.desc': "Salvador Cuevas, Solutions Architect con 16 anni di sviluppo software: banca, IA generativa, microservizi, dati su larga scala e sicurezza."
   };
 
   window.__i18n = T;
